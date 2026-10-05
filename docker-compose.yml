@@ -1,0 +1,31 @@
+services:
+  # CƠ SỞ DỮ LIỆU POSTGRESQL CHUNG
+  postgres-db:
+    image: postgres:16-alpine
+    container_name: film_postgres_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Password123!
+      POSTGRES_DB: film_platform_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - film_network
+
+  # BỘ NHỚ ĐỆM & KHÓA CHỐNG TRÙNG LỊCH (REDIS LOCK)
+  redis-cache:
+    image: redis:7-alpine
+    container_name: film_redis_cache
+    ports:
+      - "6379:6379"
+    networks:
+      - film_network
+
+networks:
+  film_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
