@@ -1,0 +1,36 @@
+# File cấu hình nhạy cảm / Mật khẩu (CẤM ĐẨY LÊN)
+.env
+.env.local
+appsettings.Development.json
+*.pem
+*.key
+
+# Backend (.NET / C#)
+bin/
+obj/
+.vs/
+*.user
+
+# Mobile (Flutter / Dart)
+.dart_tool/
+.packages
+build/
+ios/Pods/
+.flutter-plugins
+
+# Frontend Web (Next.js / Node)
+node_modules/
+.next/
+out/
+npm-debug.log*
+
+# AI (Python)
+__pycache__/
+*.py[cod]
+venv/
+*.weights
+*.onnx
+
+# Hệ điều hành
+.DS_Store
+Thumbs.db
