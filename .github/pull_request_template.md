@@ -1,7 +1,13 @@
-## Mã jira
+## Mã Jira
 
-## Những thay đổi trong nhánh
+## Mô tả
 
-## Cách test code
+## Những thay đổi
 
-## Kết quả/ Swagger (nếu có)
+## Cách kiểm thử
+
+## Kết quả kiểm thử
+
+## Swagger / API / Evidence
+
+## Checklist
