@@ -1,50 +1,13 @@
+version: '3.8'
+
 services:
-
-  gateway:
-    build:
-      context: ./gateway
+  ai-service:
+    build: ./ai-service
+    container_name: film_photo_ai_service
+    restart: always
     ports:
-      - "5000:8080"
-    depends_on:
-      - identity
-      - resource
-      - booking
-      - payment
-      - community
-      - ai
-
-  identity:
-    build:
-      context: ./services/identity
-    expose:
-      - "8080"
-
-  resource:
-    build:
-      context: ./services/resource
-    expose:
-      - "8080"
-
-  booking:
-    build:
-      context: ./services/booking
-    expose:
-      - "8080"
-
-  payment:
-    build:
-      context: ./services/payment
-    expose:
-      - "8080"
-
-  community:
-    build:
-      context: ./services/community
-    expose:
-      - "8080"
-
-  ai:
-    build:
-      context: ./ai
-    expose:
-      - "8000"
+      - "8001:8001"
+    environment:
+      - PORT=8001
+    volumes:
+      - ./ai-service/app/knowledge_base:/app/app/knowledge_base

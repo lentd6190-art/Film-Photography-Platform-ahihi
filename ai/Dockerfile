@@ -1,13 +1,11 @@
-FROM python:3.13-slim
-
+FROM eclipse-temurin:17-jdk-alpine AS build
 WORKDIR /app
-
-COPY requirements.txt .
-
-RUN pip install --no-cache-dir -r requirements.txt
-
 COPY . .
+RUN ./mvnw clean package -DskipTests || mvn clean package -DskipTests
 
+FROM eclipse-temurin:17-jre-alpine
+WORKDIR /app
+COPY --from=build /app/target/*.jar app.jar
+RUN mkdir -p /app/data/knowledge_base
 EXPOSE 8000
-
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+ENTRYPOINT ["java", "-jar", "app.jar"]
