@@ -1,0 +1,619 @@
+
+/* ========================================
+   1. RESET & GLOBAL STYLES
+======================================== */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --primary: #5367e8;
+    --primary-dark: #4053cf;
+    --background: #f6f7fb;
+    --surface: #ffffff;
+    --text: #252943;
+    --muted: #858ba3;
+    --border: #eceef5;
+    --sidebar-width: 250px;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: var(--background);
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+button {
+    font: inherit;
+    cursor: pointer;
+}
+
+/* ========================================
+   2. MAIN LAYOUT
+======================================== */
+
+.dashboard {
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: var(--sidebar-width);
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 10;
+
+    display: flex;
+    flex-direction: column;
+
+    padding: 28px 18px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+}
+
+.main-content {
+    margin-left: var(--sidebar-width);
+    min-height: 100vh;
+    padding: 0 36px;
+}
+
+/* ========================================
+   3. BRAND
+======================================== */
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    padding: 0 8px;
+    margin-bottom: 46px;
+
+    font-size: 19px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+.brand-icon {
+    width: 40px;
+    height: 40px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 13px;
+    background: var(--primary);
+    color: white;
+
+    font-size: 22px;
+    font-weight: 700;
+}
+
+/* ========================================
+   4. SIDEBAR NAVIGATION
+======================================== */
+
+.menu-label {
+    margin: 0 10px 14px;
+
+    color: #a0a5b8;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+}
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+
+    padding: 13px 14px;
+    border-radius: 10px;
+
+    color: #777e98;
+    font-size: 13px;
+    font-weight: 500;
+
+    transition: background 0.2s ease,
+                color 0.2s ease;
+}
+
+.nav-item > span:first-child {
+    width: 20px;
+    text-align: center;
+    font-size: 17px;
+}
+
+.nav-item:hover {
+    background: #f2f3ff;
+    color: var(--primary);
+}
+
+.nav-item.active {
+    background: #edf0ff;
+    color: var(--primary);
+    font-weight: 700;
+}
+
+/* ========================================
+   5. SIDEBAR USER & LOGOUT
+======================================== */
+
+.sidebar-bottom {
+    margin-top: auto;
+    padding-top: 22px;
+    border-top: 1px solid var(--border);
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+    background: #e9eaff;
+    color: var(--primary);
+
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.user-info strong {
+    display: block;
+    font-size: 12px;
+}
+
+.user-info small {
+    display: block;
+    margin-top: 3px;
+    color: var(--muted);
+    font-size: 11px;
+}
+
+.logout-button {
+    width: 100%;
+    padding: 11px 13px;
+
+    border: 1px solid #f0dfe3;
+    border-radius: 9px;
+    background: #fff8f9;
+
+    color: #c45469;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 600;
+
+    transition: background 0.2s ease;
+}
+
+.logout-button:hover {
+    background: #ffedf0;
+}
+
+/* ========================================
+   6. TOPBAR
+======================================== */
+
+.topbar {
+    min-height: 105px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+
+    border-bottom: 1px solid var(--border);
+}
+
+.breadcrumb {
+    margin-bottom: 5px;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.topbar h1 {
+    font-size: 25px;
+    font-weight: 700;
+    letter-spacing: -0.7px;
+}
+
+.topbar-user {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+
+    padding: 10px 15px;
+    border: 1px solid var(--border);
+    border-radius: 30px;
+    background: white;
+
+    color: #656b82;
+    font-size: 12px;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #37bd88;
+}
+
+/* ========================================
+   7. PAGE CONTENT & WELCOME
+======================================== */
+
+.welcome-section {
+    position: relative;
+    overflow: hidden;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+
+    min-height: 205px;
+    margin-top: 30px;
+    padding: 34px 38px;
+
+    border-radius: 18px;
+    background: linear-gradient(115deg, #5367e8, #7c78ed);
+    color: white;
+
+    box-shadow: 0 12px 30px rgba(83, 103, 232, 0.13);
+}
+
+.welcome-section > div:first-child {
+    position: relative;
+    z-index: 2;
+}
+
+.eyebrow {
+    margin-bottom: 10px;
+    color: #dce1ff;
+
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+.welcome-section h2 {
+    margin-bottom: 9px;
+    font-size: 26px;
+    letter-spacing: -0.6px;
+}
+
+.welcome-section p:not(.eyebrow) {
+    max-width: 470px;
+    color: #edf0ff;
+    font-size: 13px;
+    line-height: 1.8;
+}
+
+.welcome-icon {
+    position: relative;
+    z-index: 1;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 105px;
+    height: 105px;
+    flex-shrink: 0;
+
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 30px;
+
+    background: rgba(255, 255, 255, 0.15);
+    font-size: 45px;
+
+    transform: rotate(5deg);
+}
+
+/* ========================================
+   8. STATISTICS CARDS
+======================================== */
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+
+    margin-top: 26px;
+}
+
+.stat-card {
+    min-width: 0;
+    padding: 23px;
+
+    border: 1px solid var(--border);
+    border-radius: 15px;
+    background: var(--surface);
+
+    box-shadow: 0 4px 15px rgba(35, 42, 80, 0.025);
+
+    transition: transform 0.2s ease,
+                box-shadow 0.2s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(35, 42, 80, 0.06);
+}
+
+.stat-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+
+    color: #737991;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.stat-icon {
+    width: 39px;
+    height: 39px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 12px;
+    font-size: 19px;
+}
+
+.stat-icon.blue {
+    background: #eaf0ff;
+    color: #5574ed;
+}
+
+.stat-icon.purple {
+    background: #f0eaff;
+    color: #9065df;
+}
+
+.stat-icon.yellow {
+    background: #fff5db;
+    color: #dca83b;
+}
+
+.stat-value {
+    margin-top: 19px;
+    font-size: 31px;
+    font-weight: 700;
+    letter-spacing: -1px;
+}
+
+.stat-note {
+    margin-top: 5px;
+    color: var(--muted);
+    font-size: 11px;
+}
+
+/* ========================================
+   9. CONTENT CARD
+======================================== */
+
+.content-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+
+    margin-top: 26px;
+    padding: 25px 27px;
+
+    border: 1px solid var(--border);
+    border-radius: 15px;
+    background: var(--surface);
+}
+
+.content-card h3 {
+    margin-bottom: 8px;
+    font-size: 16px;
+}
+
+.content-card p {
+    max-width: 600px;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.8;
+}
+
+.coming-soon {
+    flex-shrink: 0;
+
+    padding: 8px 12px;
+    border-radius: 20px;
+
+    background: #fff5df;
+    color: #ad7d26;
+
+    font-size: 11px;
+    font-weight: 600;
+}
+
+/* ========================================
+   10. FOOTER
+======================================== */
+
+.page-footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+
+    margin-top: 35px;
+    padding: 20px 0 25px;
+
+    border-top: 1px solid var(--border);
+
+    color: #9a9fb2;
+    font-size: 11px;
+}
+
+/* ========================================
+   11. RESPONSIVE LAYOUT
+======================================== */
+
+@media (max-width: 1100px) {
+    :root {
+        --sidebar-width: 220px;
+    }
+
+    .main-content {
+        padding: 0 25px;
+    }
+
+    .stats-grid {
+        gap: 14px;
+    }
+
+    .stat-card {
+        padding: 18px;
+    }
+
+    .welcome-section {
+        padding: 28px;
+    }
+}
+
+@media (max-width: 800px) {
+    :root {
+        --sidebar-width: 190px;
+    }
+
+    .sidebar {
+        padding: 22px 12px;
+    }
+
+    .brand {
+        gap: 8px;
+        font-size: 16px;
+    }
+
+    .main-content {
+        padding: 0 18px;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .welcome-section h2 {
+        font-size: 22px;
+    }
+
+    .welcome-icon {
+        width: 75px;
+        height: 75px;
+        font-size: 32px;
+    }
+}
+
+@media (max-width: 560px) {
+    .sidebar {
+        position: relative;
+        width: 100%;
+        height: auto;
+        padding: 15px;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .brand {
+        margin-bottom: 20px;
+    }
+
+    .menu-label {
+        margin-bottom: 8px;
+    }
+
+    .sidebar-nav {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .sidebar-bottom {
+        margin-top: 20px;
+    }
+
+    .main-content {
+        margin-left: 0;
+        padding: 0 15px;
+    }
+
+    .topbar {
+        min-height: 85px;
+    }
+
+    .topbar h1 {
+        font-size: 21px;
+    }
+
+    .topbar-user {
+        padding: 8px 10px;
+        font-size: 10px;
+    }
+
+    .welcome-section {
+        min-height: auto;
+        padding: 25px 20px;
+    }
+
+    .welcome-section h2 {
+        font-size: 20px;
+    }
+
+    .welcome-section p:not(.eyebrow) {
+        font-size: 12px;
+    }
+
+    .welcome-icon {
+        display: none;
+    }
+
+    .content-card {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 20px;
+    }
+
+    .page-footer {
+        flex-direction: column;
+    }
+}
