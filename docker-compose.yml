@@ -1,4 +1,16 @@
-﻿services:
+version: '3.8'
+
+services:
+  ai-service:
+    build: ./ai-service
+    container_name: film_photo_ai_service
+    restart: always
+    ports:
+      - "8001:8001"
+    environment:
+      - PORT=8001
+    volumes:
+      - ./ai-service/app/knowledge_base:/app/app/knowledge_base
 
   postgres-db:
     image: postgres:16-alpine
