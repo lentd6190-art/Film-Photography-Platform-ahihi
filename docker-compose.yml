@@ -38,6 +38,7 @@ services:
       DB_URL: jdbc:postgresql://postgres-db:5432/film_platform_db
       DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD must be set}
       JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be set}
+      APP_SEED_ENABLED: "true"
     depends_on:
       postgres-db:
         condition: service_healthy
