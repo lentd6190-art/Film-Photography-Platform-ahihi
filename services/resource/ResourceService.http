@@ -1,6 +1,7 @@
-@ResourceService_HostAddress = http://localhost:5025
+@ResourceService_HostAddress = http://localhost:8080
 
-GET {{ResourceService_HostAddress}}/weatherforecast/
+### Health Check
+GET {{ResourceService_HostAddress}}/actuator/health
 Accept: application/json
 
 ###
