@@ -1,6 +1,6 @@
-
 package com.lentd6190art.fpp.identity.config;
 
+import com.lentd6190art.fpp.identity.repository.UserRepository;
 import com.lentd6190art.fpp.identity.service.JwtService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,9 +19,10 @@ public class SecurityConfig {
 
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter(
-            JwtService jwtService
+            JwtService jwtService,
+            UserRepository userRepository
     ) {
-        return new JwtAuthenticationFilter(jwtService);
+        return new JwtAuthenticationFilter(jwtService, userRepository);
     }
 
     @Bean

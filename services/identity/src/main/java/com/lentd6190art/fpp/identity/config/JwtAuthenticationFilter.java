@@ -1,6 +1,7 @@
-
 package com.lentd6190art.fpp.identity.config;
 
+import com.lentd6190art.fpp.identity.entity.Role;
+import com.lentd6190art.fpp.identity.repository.UserRepository;
 import com.lentd6190art.fpp.identity.service.JwtService;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
@@ -17,7 +18,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.List;
+import java.util.UUID;
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
@@ -25,9 +26,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             LoggerFactory.getLogger(JwtAuthenticationFilter.class);
 
     private final JwtService jwtService;
+    private final UserRepository userRepository;
 
-    public JwtAuthenticationFilter(JwtService jwtService) {
+    public JwtAuthenticationFilter(
+            JwtService jwtService,
+            UserRepository userRepository
+    ) {
         this.jwtService = jwtService;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -52,20 +58,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 Claims claims = jwtService.parseToken(token);
                 String userId = claims.getSubject();
 
-                List<?> roleClaims = claims.get("roles", List.class);
+                UUID parsedUserId = UUID.fromString(userId);
+
+                var user = userRepository.findById(parsedUserId)
+                        .orElseThrow(() ->
+                                new IllegalStateException("User not found"));
+
+                if (!user.isActive()) {
+                    throw new IllegalStateException("Account is disabled");
+                }
 
                 Collection<SimpleGrantedAuthority> authorities =
-                        roleClaims == null
-                                ? List.of()
-                                : roleClaims.stream()
-                                        .filter(String.class::isInstance)
-                                        .map(String.class::cast)
-                                        .map(role -> new SimpleGrantedAuthority(
-                                                role.startsWith("ROLE_")
-                                                        ? role
-                                                        : "ROLE_" + role
-                                        ))
-                                        .toList();
+                        user.getRoles().stream()
+                                .map(Role::getName)
+                                .map(role -> new SimpleGrantedAuthority(
+                                        role.startsWith("ROLE_")
+                                                ? role
+                                                : "ROLE_" + role
+                                ))
+                                .toList();
 
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(
@@ -73,7 +84,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                 null,
                                 authorities
                         );
-
                 authentication.setDetails(
                         new WebAuthenticationDetailsSource()
                                 .buildDetails(request)

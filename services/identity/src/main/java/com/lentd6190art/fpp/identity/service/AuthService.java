@@ -77,11 +77,8 @@ public class AuthService {
             throw new IllegalArgumentException("Account is disabled");
         }
         String accessToken = jwtService.generateAccessToken(
-        user.getId(),
-        user.getEmail(),
-        user.getRoles().stream()
-                .map(Role::getName)
-                .toList()
+                user.getId(),
+                user.getEmail()
         );
         String refreshToken = refreshTokenService.create(user);
 
