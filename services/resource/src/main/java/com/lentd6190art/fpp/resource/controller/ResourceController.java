@@ -2,6 +2,7 @@
 package com.lentd6190art.fpp.resource.controller;
 
 import com.lentd6190art.fpp.resource.dto.request.ResourceRequest;
+import com.lentd6190art.fpp.resource.dto.response.PageResponse;
 import com.lentd6190art.fpp.resource.dto.response.ResourceResponse;
 import com.lentd6190art.fpp.resource.model.enums.ResourceType;
 import com.lentd6190art.fpp.resource.service.ResourceService;
@@ -32,6 +33,19 @@ public class ResourceController {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(response);
+    }
+
+    // Get resources with pagination
+    @GetMapping("/{type}")
+    public ResponseEntity<PageResponse<ResourceResponse>> getResources(
+            @PathVariable ResourceType type,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        PageResponse<ResourceResponse> response =
+                resourceService.getResources(type, page, size);
+
+        return ResponseEntity.ok(response);
     }
 
     // Get resource detail

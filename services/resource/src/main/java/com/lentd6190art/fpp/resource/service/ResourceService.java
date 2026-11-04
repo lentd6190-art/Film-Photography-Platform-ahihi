@@ -14,9 +14,14 @@ import com.lentd6190art.fpp.resource.model.enums.ResourceType;
 import com.lentd6190art.fpp.resource.repository.ConsumableRepository;
 import com.lentd6190art.fpp.resource.repository.CreativeSpaceRepository;
 import com.lentd6190art.fpp.resource.repository.EquipmentRepository;
+import com.lentd6190art.fpp.resource.dto.response.PageResponse;
+import com.lentd6190art.fpp.resource.dto.response.PaginationMetadata;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import tools.jackson.databind.ObjectMapper;
 
@@ -218,6 +223,70 @@ public class ResourceService {
                             "Consumable not found: " + id
                     ));
         };
+    }
+
+    // ==================== GET RESOURCES WITH PAGINATION ====================
+
+    @Transactional(readOnly = true)
+    public PageResponse<ResourceResponse> getResources(
+            ResourceType resourceType,
+            int page,
+            int size
+    ) {
+        if (resourceType == null) {
+            throw new IllegalArgumentException(
+                    "Resource type is required"
+            );
+        }
+
+        if (page < 0) {
+            throw new IllegalArgumentException(
+                    "Page index must not be negative"
+            );
+        }
+
+        if (size < 1 || size > 100) {
+            throw new IllegalArgumentException(
+                    "Page size must be between 1 and 100"
+            );
+        }
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        return switch (resourceType) {
+            case CREATIVE_SPACE -> toPageResponse(
+                    creativeSpaceRepository.findAll(pageable)
+                            .map(this::toResourceResponse)
+            );
+
+            case EQUIPMENT -> toPageResponse(
+                    equipmentRepository.findAll(pageable)
+                            .map(this::toResourceResponse)
+            );
+
+            case CONSUMABLE -> toPageResponse(
+                    consumableRepository.findAll(pageable)
+                            .map(this::toResourceResponse)
+            );
+        };
+    }
+
+    private PageResponse<ResourceResponse> toPageResponse(
+            Page<ResourceResponse> resourcePage
+    ) {
+        PaginationMetadata metadata = new PaginationMetadata(
+                resourcePage.getNumber(),
+                resourcePage.getSize(),
+                resourcePage.getTotalElements(),
+                resourcePage.getTotalPages(),
+                resourcePage.hasNext(),
+                resourcePage.hasPrevious()
+        );
+
+        return new PageResponse<>(
+                resourcePage.getContent(),
+                metadata
+        );
     }
 
     // ==================== ENTITY TO RESPONSE MAPPING ====================
