@@ -1,17 +1,14 @@
+
 // Cung cấp các hàm gọi API đăng nhập và làm mới token.
 
-import axios from "axios";
-
 import apiClient from "@/lib/axios";
+import { refreshAccessToken } from "@/lib/auth/refresh-token";
 
 import type {
   AuthTokenResponse,
   LoginRequest,
   RefreshTokenRequest,
 } from "@/types/auth";
-
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
 
 // Gửi email và password lên Identity API để đăng nhập.
 async function login(
@@ -25,22 +22,11 @@ async function login(
   return response.data;
 }
 
-// Làm mới Access Token bằng Refresh Token.
-async function refreshToken(
+// Làm mới token thông qua cơ chế dùng chung.
+function refreshToken(
   request: RefreshTokenRequest,
 ): Promise<AuthTokenResponse> {
-  const response = await axios.post<AuthTokenResponse>(
-    `${API_BASE_URL}/api/v1/auth/refresh-token`,
-    request,
-    {
-      headers: {
-        "Content-Type": "application/json",
-      },
-      timeout: 10000,
-    },
-  );
-
-  return response.data;
+  return refreshAccessToken(request);
 }
 
 export const authService = {

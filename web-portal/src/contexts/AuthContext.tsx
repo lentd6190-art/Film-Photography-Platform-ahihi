@@ -1,3 +1,4 @@
+
 "use client";
 
 // Quản lý trạng thái đăng nhập, khôi phục phiên và thông tin người dùng.
@@ -12,6 +13,7 @@ import {
 } from "react";
 
 import { authService } from "@/services/auth.service";
+import { refreshAccessToken } from "@/lib/auth/refresh-token";
 import { tokenStorage } from "@/lib/auth/token-storage";
 import { decodeJwt } from "@/lib/auth/jwt";
 
@@ -32,6 +34,46 @@ const AuthContext = createContext<AuthContextType | undefined>(
   undefined,
 );
 
+// Kiểm tra Access Token có hợp lệ, có role và còn hạn hay không.
+function validateAccessToken(accessToken: string): JwtPayload {
+  const decodedUser = decodeJwt(accessToken);
+
+  if (!decodedUser) {
+    throw new Error("Access Token không hợp lệ.");
+  }
+
+  if (
+    typeof decodedUser.exp !== "number" ||
+    decodedUser.exp * 1000 <= Date.now()
+  ) {
+    throw new Error("Access Token đã hết hạn.");
+  }
+
+  if (
+    !Array.isArray(decodedUser.roles) ||
+    decodedUser.roles.length === 0
+  ) {
+    throw new Error("Tài khoản không có role hợp lệ.");
+  }
+
+  return decodedUser;
+}
+
+// Kiểm tra API có trả về đầy đủ hai token hay không.
+function validateTokenResponse(
+  accessToken?: string,
+  refreshToken?: string,
+): asserts accessToken is string {
+  if (
+    typeof accessToken !== "string" ||
+    !accessToken.trim() ||
+    typeof refreshToken !== "string" ||
+    !refreshToken.trim()
+  ) {
+    throw new Error("API không trả về đầy đủ token.");
+  }
+}
+
 export function AuthProvider({
   children,
 }: {
@@ -40,42 +82,43 @@ export function AuthProvider({
   const [user, setUser] = useState<JwtPayload | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Đăng xuất và xóa token.
+  // Đăng xuất và xóa toàn bộ thông tin xác thực.
   const logout = useCallback(() => {
     tokenStorage.clearTokens();
     setUser(null);
   }, []);
 
-  // Đăng nhập và lưu token.
+  // Đăng nhập và lưu token sau khi xác thực hợp lệ.
   const login = useCallback(
     async (credentials: LoginRequest): Promise<void> => {
-      const tokenResponse = await authService.login(credentials);
+      // Xóa phiên cũ trước khi đăng nhập tài khoản mới.
+      tokenStorage.clearTokens();
+      setUser(null);
 
-      const decodedUser = decodeJwt(tokenResponse.accessToken);
+      try {
+        const tokenResponse = await authService.login(credentials);
 
-      if (!decodedUser) {
-        tokenStorage.clearTokens();
-
-        throw new Error(
-          "Không thể đọc thông tin người dùng từ Access Token.",
+        validateTokenResponse(
+          tokenResponse.accessToken,
+          tokenResponse.refreshToken,
         );
-      }
 
-      if (
-        !tokenResponse.refreshToken ||
-        !tokenResponse.accessToken
-      ) {
+        const decodedUser = validateAccessToken(
+          tokenResponse.accessToken,
+        );
+
+        // Chỉ lưu token sau khi kiểm tra thành công.
+        tokenStorage.setTokens(
+          tokenResponse.accessToken,
+          tokenResponse.refreshToken,
+        );
+
+        setUser(decodedUser);
+      } catch (error) {
         tokenStorage.clearTokens();
-
-        throw new Error("API không trả về đầy đủ token.");
+        setUser(null);
+        throw error;
       }
-
-      tokenStorage.setTokens(
-        tokenResponse.accessToken,
-        tokenResponse.refreshToken,
-      );
-
-      setUser(decodedUser);
     },
     [],
   );
@@ -89,57 +132,45 @@ export function AuthProvider({
         const accessToken = tokenStorage.getAccessToken();
         const refreshToken = tokenStorage.getRefreshToken();
 
+        // Không có đủ hai token thì xem như chưa đăng nhập.
         if (!accessToken || !refreshToken) {
           tokenStorage.clearTokens();
           return;
         }
 
-        const decodedUser = decodeJwt(accessToken);
+        // Ưu tiên sử dụng Access Token nếu còn hạn.
+        try {
+          const decodedUser = validateAccessToken(accessToken);
 
-        // Nếu token có exp và vẫn còn hạn thì khôi phục phiên.
-        if (
-          decodedUser?.exp !== undefined &&
-          decodedUser.exp * 1000 > Date.now()
-        ) {
           if (isMounted) {
             setUser(decodedUser);
           }
 
           return;
+        } catch {
+          // Access Token không hợp lệ hoặc hết hạn.
+          // Tiếp tục thử khôi phục bằng Refresh Token.
         }
 
-        // Token hết hạn hoặc không hợp lệ: thử refresh.
-        const tokenResponse = await authService.refreshToken({
+        // Sử dụng chung cơ chế refresh với Axios.
+        const tokenResponse = await refreshAccessToken({
           refreshToken,
         });
 
-        if (
-          !tokenResponse.accessToken ||
-          !tokenResponse.refreshToken
-        ) {
-          throw new Error("API không trả về đầy đủ token mới.");
-        }
-
-        const refreshedUser = decodeJwt(tokenResponse.accessToken);
-
-        if (
-          !refreshedUser ||
-          refreshedUser.exp === undefined ||
-          refreshedUser.exp * 1000 <= Date.now()
-        ) {
-          throw new Error("Access Token mới không hợp lệ hoặc đã hết hạn.");
-        }
-
-        // Lưu cả hai token mới do backend xoay vòng refresh token.
-        tokenStorage.setTokens(
+        validateTokenResponse(
           tokenResponse.accessToken,
           tokenResponse.refreshToken,
+        );
+
+        const refreshedUser = validateAccessToken(
+          tokenResponse.accessToken,
         );
 
         if (isMounted) {
           setUser(refreshedUser);
         }
       } catch {
+        // Refresh thất bại: xóa phiên đăng nhập.
         tokenStorage.clearTokens();
 
         if (isMounted) {
@@ -152,11 +183,13 @@ export function AuthProvider({
       }
     };
 
-    void restoreSession();
-
     // Axios thông báo phiên đăng nhập đã hết hạn.
     const handleSessionExpired = (): void => {
-      setUser(null);
+      tokenStorage.clearTokens();
+
+      if (isMounted) {
+        setUser(null);
+      }
     };
 
     // Axios thông báo token đã được làm mới thành công.
@@ -164,26 +197,40 @@ export function AuthProvider({
       const accessToken = tokenStorage.getAccessToken();
 
       if (!accessToken) {
-        setUser(null);
+        if (isMounted) {
+          setUser(null);
+        }
+
         return;
       }
 
-      const decodedUser = decodeJwt(accessToken);
+      try {
+        const decodedUser = validateAccessToken(accessToken);
 
-      if (decodedUser) {
-        setUser(decodedUser);
-      } else {
+        if (isMounted) {
+          setUser(decodedUser);
+        }
+      } catch {
         tokenStorage.clearTokens();
-        setUser(null);
+
+        if (isMounted) {
+          setUser(null);
+        }
       }
     };
 
-    window.addEventListener("auth:logout", handleSessionExpired);
+    // Đăng ký sự kiện trước khi bắt đầu khôi phục phiên.
+    window.addEventListener(
+      "auth:logout",
+      handleSessionExpired,
+    );
 
     window.addEventListener(
       "auth:token-refreshed",
       handleTokenRefreshed,
     );
+
+    void restoreSession();
 
     return () => {
       isMounted = false;
