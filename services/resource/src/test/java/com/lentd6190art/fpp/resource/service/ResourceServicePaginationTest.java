@@ -17,6 +17,8 @@ import static org.mockito.Mockito.mock;
 import com.lentd6190art.fpp.resource.model.Equipment;
 import com.lentd6190art.fpp.resource.dto.response.PageResponse;
 import com.lentd6190art.fpp.resource.dto.response.ResourceResponse;
+import com.lentd6190art.fpp.resource.model.CreativeSpace;
+import com.lentd6190art.fpp.resource.model.Consumable;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -47,8 +49,118 @@ class ResourceServicePaginationTest {
                 mock(CreativeSpaceRepository.class),
                 equipmentRepository,
                 mock(ConsumableRepository.class),
-                mock(ObjectMapper.class)
-        );
+                mock(ObjectMapper.class));
+    }
+
+    @Test
+    void getResources_shouldReturnPaginatedCreativeSpace() {
+        // Arrange
+        CreativeSpace space = mock(CreativeSpace.class);
+        UUID id = UUID.randomUUID();
+        UUID providerId = UUID.randomUUID();
+        OffsetDateTime now = OffsetDateTime.now();
+
+        when(space.getId()).thenReturn(id);
+        when(space.getProviderId()).thenReturn(providerId);
+        when(space.getName()).thenReturn("Darkroom Studio");
+        when(space.getDescription()).thenReturn("Film developing studio");
+        when(space.getAddress()).thenReturn("Thu Duc, HCMC");
+        when(space.getLatitude()).thenReturn(new BigDecimal("10.8500"));
+        when(space.getLongitude()).thenReturn(new BigDecimal("106.7700"));
+        when(space.getCapacity()).thenReturn(5);
+        when(space.getAreaSqm()).thenReturn(new BigDecimal("30.00"));
+        when(space.getHourlyPrice()).thenReturn(new BigDecimal("200000"));
+        when(space.getStatus()).thenReturn("ACTIVE");
+        when(space.getCreatedAt()).thenReturn(now);
+        when(space.getUpdatedAt()).thenReturn(now);
+
+        Page<CreativeSpace> spacePage = new PageImpl<>(
+                List.of(space),
+                PageRequest.of(0, 2),
+                3);
+
+        CreativeSpaceRepository repository = mock(CreativeSpaceRepository.class);
+
+        when(repository.findAll(any(Pageable.class))).thenReturn(spacePage);
+
+        resourceService = new ResourceService(
+                repository,
+                equipmentRepository,
+                mock(ConsumableRepository.class),
+                mock(ObjectMapper.class));
+
+        // Act
+        PageResponse<ResourceResponse> response = resourceService.getResources(ResourceType.CREATIVE_SPACE, 0, 2);
+
+        // Assert
+        assertEquals(1, response.data().size());
+        assertEquals(id, response.data().get(0).id());
+        assertEquals("Darkroom Studio", response.data().get(0).name());
+        assertEquals(ResourceType.CREATIVE_SPACE, response.data().get(0).resourceType());
+        assertEquals("Thu Duc, HCMC", response.data().get(0).attributes().get("address"));
+        assertEquals(5, response.data().get(0).attributes().get("capacity"));
+
+        assertEquals(0, response.pagination().page());
+        assertEquals(2, response.pagination().size());
+        assertEquals(3, response.pagination().totalElements());
+        assertEquals(2, response.pagination().totalPages());
+        assertTrue(response.pagination().hasNext());
+        assertFalse(response.pagination().hasPrevious());
+    }
+
+    @Test
+    void getResources_shouldReturnPaginatedConsumable() {
+        // Arrange
+        Consumable consumable = mock(Consumable.class);
+        UUID id = UUID.randomUUID();
+        UUID providerId = UUID.randomUUID();
+        OffsetDateTime now = OffsetDateTime.now();
+
+        when(consumable.getId()).thenReturn(id);
+        when(consumable.getProviderId()).thenReturn(providerId);
+        when(consumable.getName()).thenReturn("Kodak Portra 400");
+        when(consumable.getDescription()).thenReturn("35mm colour film");
+        when(consumable.getStockQuantity()).thenReturn(20);
+        when(consumable.getReorderLevel()).thenReturn(5);
+        when(consumable.getUnitPrice()).thenReturn(new BigDecimal("350000"));
+        when(consumable.getUnit()).thenReturn("roll");
+        when(consumable.getExpiryDate()).thenReturn(null);
+        when(consumable.getStatus()).thenReturn("ACTIVE");
+        when(consumable.getCreatedAt()).thenReturn(now);
+        when(consumable.getUpdatedAt()).thenReturn(now);
+
+        Page<Consumable> consumablePage = new PageImpl<>(
+                List.of(consumable),
+                PageRequest.of(1, 2),
+                5);
+
+        ConsumableRepository repository = mock(ConsumableRepository.class);
+
+        when(repository.findAll(any(Pageable.class))).thenReturn(consumablePage);
+
+        resourceService = new ResourceService(
+                mock(CreativeSpaceRepository.class),
+                equipmentRepository,
+                repository,
+                mock(ObjectMapper.class));
+
+        // Act
+        PageResponse<ResourceResponse> response = resourceService.getResources(ResourceType.CONSUMABLE, 1, 2);
+
+        // Assert
+        assertEquals(1, response.data().size());
+        assertEquals(id, response.data().get(0).id());
+        assertEquals("Kodak Portra 400", response.data().get(0).name());
+        assertEquals(ResourceType.CONSUMABLE, response.data().get(0).resourceType());
+        assertEquals(20, response.data().get(0).attributes().get("stockQuantity"));
+        assertEquals("roll", response.data().get(0).attributes().get("unit"));
+
+        assertEquals(1, response.pagination().page());
+        assertEquals(2, response.pagination().size());
+        assertEquals(5, response.pagination().totalElements());
+        assertEquals(3, response.pagination().totalPages());
+        assertTrue(response.pagination().hasNext());
+        assertTrue(response.pagination().hasPrevious());
     }
 
     @Test
@@ -56,9 +168,7 @@ class ResourceServicePaginationTest {
         assertThrows(
                 IllegalArgumentException.class,
                 () -> resourceService.getResources(
-                        ResourceType.EQUIPMENT, -1, 10
-                )
-        );
+                        ResourceType.EQUIPMENT, -1, 10));
     }
 
     @Test
@@ -66,9 +176,7 @@ class ResourceServicePaginationTest {
         assertThrows(
                 IllegalArgumentException.class,
                 () -> resourceService.getResources(
-                        ResourceType.EQUIPMENT, 0, 0
-                )
-        );
+                        ResourceType.EQUIPMENT, 0, 0));
     }
 
     @Test
@@ -76,9 +184,7 @@ class ResourceServicePaginationTest {
         assertThrows(
                 IllegalArgumentException.class,
                 () -> resourceService.getResources(
-                        ResourceType.EQUIPMENT, 0, 101
-                )
-        );
+                        ResourceType.EQUIPMENT, 0, 101));
     }
 
     @Test
@@ -121,15 +227,13 @@ class ResourceServicePaginationTest {
         Page<Equipment> equipmentPage = new PageImpl<>(
                 List.of(equipment1, equipment2),
                 PageRequest.of(0, 2),
-                5
-        );
+                5);
 
         when(equipmentRepository.findAll(any(Pageable.class)))
                 .thenReturn(equipmentPage);
 
         // Act: Call service
-        PageResponse<ResourceResponse> response =
-                resourceService.getResources(ResourceType.EQUIPMENT, 0, 2);
+        PageResponse<ResourceResponse> response = resourceService.getResources(ResourceType.EQUIPMENT, 0, 2);
 
         // Assert: Pagination metadata
         assertEquals(0, response.pagination().page());
@@ -164,6 +268,48 @@ class ResourceServicePaginationTest {
     }
 
     @Test
+    void getResources_shouldReturnMiddlePageWithNextAndPrevious() {
+        // Arrange
+        Equipment equipment = mock(Equipment.class);
+        OffsetDateTime now = OffsetDateTime.now();
+
+        when(equipment.getId()).thenReturn(UUID.randomUUID());
+        when(equipment.getProviderId()).thenReturn(UUID.randomUUID());
+        when(equipment.getName()).thenReturn("Film Camera");
+        when(equipment.getDescription()).thenReturn("35mm camera");
+        when(equipment.getCategory()).thenReturn("Camera");
+        when(equipment.getBrand()).thenReturn("Canon");
+        when(equipment.getModel()).thenReturn("AE-1");
+        when(equipment.getEquipmentCondition()).thenReturn("GOOD");
+        when(equipment.getStatus()).thenReturn("AVAILABLE");
+        when(equipment.getRentalPrice()).thenReturn(new BigDecimal("150000"));
+        when(equipment.getCreatedAt()).thenReturn(now);
+        when(equipment.getUpdatedAt()).thenReturn(now);
+
+        Page<Equipment> equipmentPage = new PageImpl<>(
+                List.of(equipment, equipment),
+                PageRequest.of(1, 2),
+                5);
+
+        when(equipmentRepository.findAll(any(Pageable.class)))
+                .thenReturn(equipmentPage);
+
+        // Act
+        PageResponse<ResourceResponse> response = resourceService.getResources(ResourceType.EQUIPMENT, 1, 2);
+
+        // Assert
+        assertEquals(1, response.pagination().page());
+        assertEquals(2, response.pagination().size());
+        assertEquals(5, response.pagination().totalElements());
+        assertEquals(3, response.pagination().totalPages());
+
+        assertTrue(response.pagination().hasNext());
+        assertTrue(response.pagination().hasPrevious());
+
+        assertEquals(2, response.data().size());
+    }
+
+    @Test
     void getResources_shouldReturnLastPageWithoutNextPage() {
         // Arrange
         Equipment equipment = mock(Equipment.class);
@@ -186,15 +332,13 @@ class ResourceServicePaginationTest {
         Page<Equipment> equipmentPage = new PageImpl<>(
                 List.of(equipment),
                 PageRequest.of(2, 2),
-                5
-        );
+                5);
 
         when(equipmentRepository.findAll(any(Pageable.class)))
                 .thenReturn(equipmentPage);
 
         // Act
-        PageResponse<ResourceResponse> response =
-                resourceService.getResources(ResourceType.EQUIPMENT, 2, 2);
+        PageResponse<ResourceResponse> response = resourceService.getResources(ResourceType.EQUIPMENT, 2, 2);
 
         // Assert
         assertEquals(2, response.pagination().page());
@@ -214,15 +358,13 @@ class ResourceServicePaginationTest {
         Page<Equipment> emptyPage = new PageImpl<>(
                 List.of(),
                 PageRequest.of(0, 10),
-                0
-        );
+                0);
 
         when(equipmentRepository.findAll(any(Pageable.class)))
                 .thenReturn(emptyPage);
 
         // Act
-        PageResponse<ResourceResponse> response =
-                resourceService.getResources(ResourceType.EQUIPMENT, 0, 10);
+        PageResponse<ResourceResponse> response = resourceService.getResources(ResourceType.EQUIPMENT, 0, 10);
 
         // Assert
         assertTrue(response.data().isEmpty());
