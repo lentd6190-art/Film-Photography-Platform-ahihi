@@ -156,4 +156,3 @@ public class CreativeSpace {
         return updatedAt;
     }
 }
-
