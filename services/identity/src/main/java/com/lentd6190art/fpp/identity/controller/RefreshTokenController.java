@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-import com.lentd6190art.fpp.identity.entity.Role;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -47,11 +46,8 @@ public class RefreshTokenController {
 
         String newRefreshToken = refreshTokenService.create(user);
         String newAccessToken = jwtService.generateAccessToken(
-        user.getId(),
-        user.getEmail(),
-        user.getRoles().stream()
-                .map(Role::getName)
-                .toList()
+                user.getId(),
+                user.getEmail()
         );
 
         return ResponseEntity.ok(new RefreshTokenResponse(
