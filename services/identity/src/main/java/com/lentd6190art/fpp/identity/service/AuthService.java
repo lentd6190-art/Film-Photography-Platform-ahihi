@@ -1,6 +1,8 @@
 
 package com.lentd6190art.fpp.identity.service;
 
+import java.util.List;
+
 import com.lentd6190art.fpp.identity.dto.LoginRequest;
 import com.lentd6190art.fpp.identity.dto.LoginResponse;
 import com.lentd6190art.fpp.identity.dto.RegisterRequest;
@@ -76,9 +78,14 @@ public class AuthService {
         if (!user.isActive()) {
             throw new IllegalArgumentException("Account is disabled");
         }
+        List<String> roles = user.getRoles().stream()
+                .map(Role::getName)
+                .toList();
+
         String accessToken = jwtService.generateAccessToken(
                 user.getId(),
-                user.getEmail()
+                user.getEmail(),
+                roles
         );
         String refreshToken = refreshTokenService.create(user);
 
