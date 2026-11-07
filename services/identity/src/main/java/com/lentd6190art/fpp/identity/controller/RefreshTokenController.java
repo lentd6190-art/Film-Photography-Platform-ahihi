@@ -1,9 +1,12 @@
 
 package com.lentd6190art.fpp.identity.controller;
 
+import java.util.List;
+
 import com.lentd6190art.fpp.identity.dto.RefreshTokenRequest;
 import com.lentd6190art.fpp.identity.dto.RefreshTokenResponse;
 import com.lentd6190art.fpp.identity.entity.RefreshToken;
+import com.lentd6190art.fpp.identity.entity.Role;
 import com.lentd6190art.fpp.identity.entity.User;
 import com.lentd6190art.fpp.identity.service.JwtService;
 import com.lentd6190art.fpp.identity.service.RefreshTokenService;
@@ -45,9 +48,14 @@ public class RefreshTokenController {
         refreshTokenService.revoke(oldToken);
 
         String newRefreshToken = refreshTokenService.create(user);
+        List<String> roles = user.getRoles().stream()
+                .map(Role::getName)
+                .toList();
+
         String newAccessToken = jwtService.generateAccessToken(
                 user.getId(),
-                user.getEmail()
+                user.getEmail(),
+                roles
         );
 
         return ResponseEntity.ok(new RefreshTokenResponse(
