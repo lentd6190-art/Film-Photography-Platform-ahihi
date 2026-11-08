@@ -20,3 +20,21 @@ export interface LoginRequest {
     exp?: number;
     iat?: number;
   }
+  // Dữ liệu gửi lên API khi đăng ký Provider.
+export interface ProviderRegisterRequest {
+  email: string;
+  password: string;
+  fullName: string;
+  businessName: string;
+  phone: string;
+  address: string;
+  serviceType: string;
+}
+
+// Dữ liệu nhận về sau khi đăng ký Provider thành công.
+export interface ProviderRegisterResponse {
+  userId: string;
+  providerProfileId: string;
+  status: "PENDING" | "APPROVED" | "REJECTED";
+  message: string;
+}
