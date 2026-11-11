@@ -27,3 +27,25 @@ class BackendClient:
                     {"id": "equip-1", "name": "Canon AE-1 Film Camera", "category": "EQUIPMENT", "price": 150.0, "styles": ["Vintage", "Street"], "rating": 4.9, "location": "Hanoi"},
                     {"id": "pkg-1", "name": "Full Daylight Studio Package", "category": "SERVICE_PACKAGE", "price": 800.0, "styles": ["Portrait", "Fashion"], "rating": 4.7, "location": "Hanoi"}
                 ]
+
+
+    async def get_available_resources(self, start_time: str, end_time: str) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
+        async with httpx.AsyncClient() as client:
+            try:
+                # Gọi Backend API lấy danh sách phòng & thiết bị rảnh
+                spaces_res = await client.get(f"{self.base_url}/api/v1/spaces/available", params={"start": start_time, "end": end_time})
+                equip_res = await client.get(f"{self.base_url}/api/v1/equipment/available", params={"start": start_time, "end": end_time})
+                
+                spaces = spaces_res.json().get("data", []) if spaces_res.status_code == 200 else []
+                equipments = equip_res.json().get("data", []) if equip_res.status_code == 200 else []
+                return spaces, equipments
+            except httpx.RequestError:
+                # Mock Data dự phòng khi chưa chạy server Backend
+                mock_spaces = [
+                    {"id": "space-1", "name": "Studio Tròn", "capacity": 5, "is_available": True},
+                    {"id": "space-2", "name": "Studio Vuông Grande", "capacity": 20, "is_available": True}
+                ]
+                mock_equipments = [
+                    {"id": "eq-1", "type": "LIGHT", "is_available": True, "compatible_space_ids": ["space-1", "space-2"]}
+                ]
+                return mock_spaces, mock_equipments

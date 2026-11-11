@@ -65,3 +65,27 @@ class RecommendationResponse(BaseModel):
     user_id: str
     recommendations: List[RecommendedItem]
     is_fallback: bool
+
+
+    # ==========================================
+# 4. Resource Allocation Optimization Schemas
+# ==========================================
+
+class AllocationRequest(BaseModel):
+    request_id: str = Field(..., description="ID của yêu cầu đặt lịch")
+    start_time: str = Field(..., description="Thời gian bắt đầu (ISO string)")
+    end_time: str = Field(..., description="Thời gian kết thúc (ISO string)")
+    capacity_required: int = Field(..., gt=0, description="Sức chứa tối thiểu yêu cầu")
+    equipment_required: Optional[List[str]] = Field(default=[], description="Danh sách loại thiết bị yêu cầu")
+
+class AllocationOption(BaseModel):
+    space_id: str
+    space_name: str
+    allocated_equipment: List[str]
+    score: float
+    reason: str
+
+class AllocationOptimizationResponse(BaseModel):
+    request_id: str
+    recommended_allocation: Optional[AllocationOption] = None
+    alternative_options: List[AllocationOption] = []

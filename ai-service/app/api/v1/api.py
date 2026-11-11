@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.api.v1.endpoints import restoration, recommendation, assistant, rag
+from app.api.v1.endpoints import restoration, recommendation, assistant, rag, allocation
 
 api_router = APIRouter()
 
@@ -22,4 +22,9 @@ api_router.include_router(
     rag.router, 
     prefix="/rag", 
     tags=["Knowledge Base & RAG"]
+)
+api_router.include_router(
+    allocation.router,
+    prefix="/allocation",
+    tags=["Resource Allocation Optimization"]
 )
