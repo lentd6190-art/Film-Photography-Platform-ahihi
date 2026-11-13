@@ -34,3 +34,20 @@ venv/
 # Hệ điều hành
 .DS_Store
 Thumbs.db
+
+# Python virtual environment
+.venv/
+
+# Java / Maven
+target/
+*.class
+*.jar
+.mvn/wrapper/maven-wrapper.jar
+
+# IDE / Editor
+.idea/
+.vscode/
+
+# Temporary / Backup files
+*.bak
+*~

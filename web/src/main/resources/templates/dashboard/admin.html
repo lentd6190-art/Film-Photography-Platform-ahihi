@@ -1,0 +1,192 @@
+
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Admin Dashboard | Film Photography Platform</title>
+
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+</head>
+
+<body>
+<div class="dashboard">
+
+    <!-- Sidebar: Thanh điều hướng quản trị -->
+    <aside class="sidebar">
+
+        <a class="brand" th:href="@{/admin/dashboard}">
+            <span class="brand-icon">F</span>
+            <span>Film Platform</span>
+        </a>
+
+        <p class="menu-label">ADMIN WORKSPACE</p>
+
+        <nav class="sidebar-nav" aria-label="Điều hướng quản trị">
+
+            <a class="nav-item active"
+               th:href="@{/admin/dashboard}"
+               aria-current="page">
+                <span aria-hidden="true">▦</span>
+                Dashboard
+            </a>
+
+            <a class="nav-item" href="#users">
+                <span aria-hidden="true">♙</span>
+                Quản lý người dùng
+            </a>
+
+            <a class="nav-item" href="#providers">
+                <span aria-hidden="true">▣</span>
+                Nhà cung cấp
+            </a>
+
+            <a class="nav-item" href="#services">
+                <span aria-hidden="true">▧</span>
+                Quản lý dịch vụ
+            </a>
+
+            <a class="nav-item" href="#reports">
+                <span aria-hidden="true">▤</span>
+                Báo cáo hệ thống
+            </a>
+
+        </nav>
+
+        <!-- Thông tin tài khoản -->
+        <div class="sidebar-bottom">
+
+            <div class="user-info">
+                <div class="avatar" aria-hidden="true">A</div>
+
+                <div>
+                    <strong>Administrator</strong>
+                    <small>Admin account</small>
+                </div>
+            </div>
+
+            <!-- Spring Security xử lý đăng xuất -->
+            <form th:action="@{/logout}" method="post">
+                <button class="logout-button" type="submit">
+                    &#8617; Đăng xuất
+                </button>
+            </form>
+
+        </div>
+
+    </aside>
+
+    <!-- Nội dung chính -->
+    <main class="main-content">
+
+        <!-- Thanh tiêu đề -->
+        <header class="topbar">
+
+            <div>
+                <p class="breadcrumb">
+                    Admin Workspace / Dashboard
+                </p>
+
+                <h1>Dashboard</h1>
+            </div>
+
+            <div class="topbar-user">
+                <span class="status-dot" aria-hidden="true"></span>
+                Quản trị viên
+            </div>
+
+        </header>
+
+        <!-- Lời chào -->
+        <section class="welcome-section">
+
+            <div>
+                <p class="eyebrow">ADMINISTRATOR PORTAL</p>
+
+                <h2>Chào mừng đến trang quản trị!</h2>
+
+                <p>
+                    Quản lý người dùng, nhà cung cấp và theo dõi
+                    hoạt động của Film Photography Platform tại đây.
+                </p>
+            </div>
+
+            <div class="welcome-icon" aria-hidden="true">
+                &#9881;
+            </div>
+
+        </section>
+
+        <!-- Các thẻ thống kê minh họa -->
+        <section class="stats-grid" aria-label="Thống kê hệ thống">
+
+            <!-- Tổng quan người dùng -->
+            <article class="stat-card" id="users">
+
+                <div class="stat-heading">
+                    <span>Người dùng</span>
+                    <span class="stat-icon blue" aria-hidden="true">♙</span>
+                </div>
+
+                <p class="stat-value">0</p>
+                <p class="stat-note">Dữ liệu minh họa</p>
+
+            </article>
+
+            <!-- Tổng quan nhà cung cấp -->
+            <article class="stat-card" id="providers">
+
+                <div class="stat-heading">
+                    <span>Nhà cung cấp</span>
+                    <span class="stat-icon purple" aria-hidden="true">▣</span>
+                </div>
+
+                <p class="stat-value">0</p>
+                <p class="stat-note">Dữ liệu minh họa</p>
+
+            </article>
+
+            <!-- Tổng quan dịch vụ -->
+            <article class="stat-card" id="services">
+
+                <div class="stat-heading">
+                    <span>Dịch vụ</span>
+                    <span class="stat-icon yellow" aria-hidden="true">▧</span>
+                </div>
+
+                <p class="stat-value">0</p>
+                <p class="stat-note">Dữ liệu minh họa</p>
+
+            </article>
+
+        </section>
+
+        <!-- Khu vực quản lý hệ thống -->
+        <section class="content-card" id="reports">
+
+            <div>
+                <h3>Quản lý hệ thống</h3>
+
+                <p>
+                    Các chức năng quản trị người dùng, nhà cung cấp,
+                    dịch vụ và báo cáo sẽ được kết nối với backend
+                    khi API tương ứng sẵn sàng.
+                </p>
+            </div>
+
+            <span class="coming-soon">Đang phát triển</span>
+
+        </section>
+
+        <!-- Chân trang -->
+        <footer class="page-footer">
+            Film Photography Platform · Administrator Portal
+        </footer>
+
+    </main>
+
+</div>
+</body>
+</html>

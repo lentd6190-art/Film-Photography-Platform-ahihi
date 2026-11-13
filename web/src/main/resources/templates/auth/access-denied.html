@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Không có quyền truy cập | Film Photography Platform</title>
+
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+    <style>
+        .access-denied-page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .access-denied-card {
+            width: 100%;
+            max-width: 480px;
+            padding: 40px 32px;
+            text-align: center;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            box-shadow: 0 12px 35px rgba(35, 42, 80, 0.08);
+        }
+
+        .access-denied-code {
+            margin-bottom: 12px;
+            color: var(--primary);
+            font-size: 48px;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .access-denied-card h1 {
+            margin-bottom: 12px;
+            font-size: 22px;
+        }
+
+        .access-denied-message {
+            margin-bottom: 26px;
+            color: var(--muted);
+        }
+
+        .access-denied-link {
+            display: inline-block;
+            padding: 11px 20px;
+            border-radius: 9px;
+            background: var(--primary);
+            color: #fff;
+            font-weight: 600;
+            transition: background 0.2s ease;
+        }
+
+        .access-denied-link:hover {
+            background: var(--primary-dark);
+        }
+    </style>
+</head>
+<body>
+    <main class="access-denied-page">
+        <section class="access-denied-card"
+                 aria-labelledby="access-denied-title">
+
+            <p class="access-denied-code">403</p>
+
+            <h1 id="access-denied-title">
+                Bạn không có quyền truy cập
+            </h1>
+
+            <p class="access-denied-message"
+               th:text="${message}">
+                Bạn không có quyền truy cập trang này.
+            </p>
+
+            <a class="access-denied-link" th:href="@{/dashboard}">
+                Quay lại Dashboard
+            </a>
+        </section>
+    </main>
+</body>
+</html>

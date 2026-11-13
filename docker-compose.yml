@@ -1,25 +1,118 @@
+﻿version: '3.8'
+
 services:
-  # CƠ SỞ DỮ LIỆU POSTGRESQL CHUNG
+  ai-service:
+    build: ./ai-service
+    container_name: film_photo_ai_service
+    restart: always
+    ports:
+      - "8001:8001"
+    environment:
+      - PORT=8001
+    volumes:
+      - ./ai-service/app/knowledge_base:/app/app/knowledge_base
+
   postgres-db:
     image: postgres:16-alpine
     container_name: film_postgres_db
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: Password123!
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD must be set}
       POSTGRES_DB: film_platform_db
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d film_platform_db"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
     networks:
       - film_network
 
-  # BỘ NHỚ ĐỆM & KHÓA CHỐNG TRÙNG LỊCH (REDIS LOCK)
+  identity:
+    build:
+      context: ./services/identity
+    environment:
+      DB_URL: jdbc:postgresql://postgres-db:5432/film_platform_db
+      DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD must be set}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be set}
+      APP_SEED_ENABLED: "true"
+    depends_on:
+      postgres-db:
+        condition: service_healthy
+    expose:
+      - "8080"
+    networks:
+      - film_network
+
   redis-cache:
     image: redis:7-alpine
     container_name: film_redis_cache
     ports:
       - "6379:6379"
+    networks:
+      - film_network
+
+  gateway:
+    build:
+      context: ./gateway
+    ports:
+      - "5000:8080"
+    depends_on:
+      - identity
+      - resource
+      - booking
+      - payment
+      - community
+      - ai
+    networks:
+      - film_network
+
+  resource:
+    build:
+      context: ./services/resource
+    environment:
+      DB_URL: jdbc:postgresql://postgres-db:5432/resource_db
+      DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD must be set}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be set}
+    ports:
+      - "8081:8080"
+    expose:
+      - "8080"
+    networks:
+      - film_network
+
+  booking:
+    build:
+      context: ./services/booking
+    expose:
+      - "8080"
+    networks:
+      - film_network
+
+  payment:
+    build:
+      context: ./services/payment
+    expose:
+      - "8080"
+    networks:
+      - film_network
+
+  community:
+    build:
+      context: ./services/community
+    expose:
+      - "8080"
+    networks:
+      - film_network
+
+  ai:
+    build:
+      context: ./ai
+    expose:
+      - "8000"
     networks:
       - film_network
 

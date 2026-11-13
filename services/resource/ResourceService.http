@@ -1,0 +1,7 @@
+@ResourceService_HostAddress = http://localhost:8080
+
+### Health Check
+GET {{ResourceService_HostAddress}}/actuator/health
+Accept: application/json
+
+###
