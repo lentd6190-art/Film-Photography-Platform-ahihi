@@ -1,5 +1,6 @@
 import httpx
-from typing import List, Dict, Any
+from datetime import datetime, timedelta, timezone
+from typing import List, Dict, Any, Optional, Tuple
 
 class BackendClient:
     def __init__(self, base_url: str = "http://localhost:8000"):
@@ -49,3 +50,50 @@ class BackendClient:
                     {"id": "eq-1", "type": "LIGHT", "is_available": True, "compatible_space_ids": ["space-1", "space-2"]}
                 ]
                 return mock_spaces, mock_equipments
+
+
+    async def get_historical_bookings(
+        self,
+        category: str,
+        resource_id: Optional[str] = None,
+        location: Optional[str] = None
+    ) -> Tuple[List[Dict[str, Any]], datetime]:
+        params = {"category": category}
+        if resource_id:
+            params["resourceId"] = resource_id
+        if location:
+            params["location"] = location
+
+        async with httpx.AsyncClient() as client:
+            try:
+                res = await client.get(f"{self.base_url}/api/internal/analytics/bookings", params=params, timeout=15.0)
+                if res.status_code == 200:
+                    payload = res.json()
+                    records = payload.get("data", []) if isinstance(payload, dict) else payload
+                    refreshed_str = payload.get("last_synced_at") if isinstance(payload, dict) else None
+                    last_refresh = (
+                        datetime.fromisoformat(refreshed_str.replace("Z", "+00:00"))
+                        if refreshed_str
+                        else datetime.now(timezone.utc)
+                    )
+                    return records, last_refresh
+                return [], datetime.now(timezone.utc)
+            except httpx.RequestError:
+                # Mock Data 30 ngày lịch sử dự phòng khi chưa chạy server Backend
+                base_date = datetime.now().date() - timedelta(days=30)
+                mock_records = []
+                for i in range(30):
+                    d = (base_date + timedelta(days=i)).isoformat()
+                    count = (i % 4) + 2  # Tạo sóng nhu cầu theo chu kỳ tuần
+                    for j in range(count):
+                        mock_records.append({
+                            "booking_id": f"bk-mock-{i}-{j}",
+                            "booking_date": d,
+                            "booking_time": "09:00",
+                            "resource_category": category,
+                            "resource_id": resource_id or "space-1",
+                            "location": location or "HCM",
+                            "status": "COMPLETED",
+                            "duration_hours": 2.0
+                        })
+                return mock_records, datetime.now(timezone.utc)

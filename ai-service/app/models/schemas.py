@@ -1,3 +1,5 @@
+from datetime import datetime, date
+from enum import Enum
 from pydantic import BaseModel, Field
 from typing import Optional, List, Dict, Any
 
@@ -89,3 +91,62 @@ class AllocationOptimizationResponse(BaseModel):
     request_id: str
     recommended_allocation: Optional[AllocationOption] = None
     alternative_options: List[AllocationOption] = []
+
+
+    # ==========================================
+# 5. Booking Demand Forecasting Schemas (FPP-52)
+# ==========================================
+
+class ForecastResourceCategory(str, Enum):
+    CREATIVE_SPACE = "CREATIVE_SPACE"
+    EQUIPMENT = "EQUIPMENT"
+    SERVICE_PACKAGE = "SERVICE_PACKAGE"
+
+class ForecastGranularity(str, Enum):
+    DAILY = "daily"
+    WEEKLY = "weekly"
+    MONTHLY = "monthly"
+
+class ForecastRequest(BaseModel):
+    resource_category: ForecastResourceCategory
+    resource_id: Optional[str] = Field(None, description="ID cụ thể của không gian/thiết bị/gói (để trống nếu dự báo cả category)")
+    location: Optional[str] = Field(None, description="Khu vực/chi nhánh nếu có")
+    granularity: ForecastGranularity = ForecastGranularity.DAILY
+    horizon: int = Field(7, ge=1, le=90, description="Số kỳ tương lai cần dự báo (1 - 90)")
+
+class HistoricalBookingItem(BaseModel):
+    booking_id: str
+    booking_date: date
+    booking_time: Optional[str] = None
+    resource_category: ForecastResourceCategory
+    resource_id: str
+    location: Optional[str] = None
+    status: str
+    duration_hours: float = 1.0
+
+class ForecastDataPoint(BaseModel):
+    period: str
+    value: float
+    lower_bound: Optional[float] = None
+    upper_bound: Optional[float] = None
+    is_predicted: bool
+
+class ForecastEvaluation(BaseModel):
+    baseline_method: str = "SeasonalNaive"
+    model_used: str
+    mae: Optional[float] = None
+    mape: Optional[float] = None
+    baseline_mae: Optional[float] = None
+
+class ForecastResponse(BaseModel):
+    resource_category: ForecastResourceCategory
+    resource_id: Optional[str]
+    granularity: ForecastGranularity
+    forecast_horizon: int
+    reliability: str
+    warnings: List[str] = []
+    trend_direction: str
+    historical_series: List[ForecastDataPoint]
+    predictions: List[ForecastDataPoint]
+    evaluation: ForecastEvaluation
+    metadata: Dict[str, Any]
