@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import Optional, List
+from typing import Optional, List, Dict, Any
 
 class FilmRestoreRequest(BaseModel):
     image_url: str = Field(..., description="URL ảnh scan phim")
@@ -23,10 +23,19 @@ class RecommendationResponse(BaseModel):
     recommendation_score: float
 
 class ChatAssistantRequest(BaseModel):
-    session_id: str
-    message: str
+    session_id: str = Field(..., description="ID phiên hội thoại")
+    message: str = Field(..., description="Câu hỏi của người dùng")
+
+class RecommendationItem(BaseModel):
+    id: str
+    type: str = Field(..., description="Loại gợi ý: space, equipment, service_package")
+    name: str
+    description: Optional[str] = None
+    details: Optional[Dict[str, Any]] = None
 
 class ChatAssistantResponse(BaseModel):
     session_id: str
     reply: str
-    sources: Optional[List[str]] = []
+    sources: Optional[List[str]] = Field(default=[], description="Nguồn trích dẫn từ Knowledge Base")
+    recommendations: Optional[List[RecommendationItem]] = Field(default=[], description="Danh sách gợi ý thiết bị/dịch vụ")
+    is_sufficient_knowledge: bool = Field(default=True, description="Cờ đánh giá dữ liệu trong RAG có đủ hay không")
