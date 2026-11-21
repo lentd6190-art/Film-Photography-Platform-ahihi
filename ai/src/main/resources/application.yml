@@ -1,0 +1,16 @@
+server:
+  port: 8000
+
+spring:
+  application:
+    name: ai-service
+
+app:
+  knowledge-base-dir: ./data/knowledge_base
+  analytics-api-key: ${ANALYTICS_DATA_API_KEY:secret-api-key}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

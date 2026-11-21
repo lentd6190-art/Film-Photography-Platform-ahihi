@@ -1,0 +1,126 @@
+
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập | Film Photography Platform</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: Arial, sans-serif;
+            background: #f4f6fb;
+            color: #1f2937;
+        }
+
+        .login-card {
+            width: min(420px, 92%);
+            padding: 36px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+        }
+
+        h1 {
+            margin-top: 0;
+            font-size: 26px;
+        }
+
+        .subtitle {
+            color: #64748b;
+            margin-bottom: 26px;
+        }
+
+        label {
+            display: block;
+            margin: 16px 0 8px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 15px;
+        }
+
+        button {
+            width: 100%;
+            margin-top: 24px;
+            padding: 13px;
+            border: none;
+            border-radius: 8px;
+            background: #2563eb;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        .message {
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .success {
+            background: #dcfce7;
+            color: #166534;
+        }
+    </style>
+</head>
+
+<body>
+    <main class="login-card">
+        <h1>Welcome back</h1>
+        <p class="subtitle">Đăng nhập vào Film Photography Platform</p>
+
+        <p th:if="${param.error}"
+           class="message error">
+            Tên đăng nhập hoặc mật khẩu không chính xác.
+        </p>
+
+        <p th:if="${param.logout}"
+           class="message success">
+            Bạn đã đăng xuất thành công.
+        </p>
+
+        <form th:action="@{/login}" method="post">
+            <label for="username">Tên đăng nhập</label>
+            <input id="username"
+                   name="username"
+                   type="text"
+                   autocomplete="username"
+                   required>
+
+            <label for="password">Mật khẩu</label>
+            <input id="password"
+                   name="password"
+                   type="password"
+                   autocomplete="current-password"
+                   required>
+
+            <button type="submit">Đăng nhập</button>
+        </form>
+    </main>
+</body>
+</html>
