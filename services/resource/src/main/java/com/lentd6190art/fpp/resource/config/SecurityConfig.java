@@ -45,10 +45,10 @@ public class SecurityConfig {
                     "/swagger-ui.html",
                     "/v3/api-docs/**"
                 ).permitAll()
-
+                .requestMatchers("/api/resources/**")
+                    .hasRole("SERVICE_PROVIDER")
                 .requestMatchers("/api/creative-spaces/**")
                     .hasRole("SERVICE_PROVIDER")
-
                 .anyRequest().permitAll()
             )
 
