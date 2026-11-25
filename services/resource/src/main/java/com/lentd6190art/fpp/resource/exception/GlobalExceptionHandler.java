@@ -8,11 +8,13 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
+import org.springframework.security.access.AccessDeniedException;
 
 import jakarta.validation.ConstraintViolationException;
 
 import java.time.Instant;
 import java.util.Map;
+import tools.jackson.core.JacksonException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -23,10 +25,27 @@ public class GlobalExceptionHandler {
                 return buildResponse(HttpStatus.NOT_FOUND, exception.getMessage());
         }
 
+
+        @ExceptionHandler(AccessDeniedException.class)
+        public ResponseEntity<Map<String, Object>> handleAccessDenied(
+                        AccessDeniedException exception) {
+                return buildResponse(
+                                HttpStatus.FORBIDDEN,
+                                exception.getMessage());
+        }
+
         @ExceptionHandler(IllegalArgumentException.class)
         public ResponseEntity<Map<String, Object>> handleBadRequest(
                         IllegalArgumentException exception) {
                 return buildResponse(HttpStatus.BAD_REQUEST, exception.getMessage());
+        }
+
+        @ExceptionHandler(JacksonException.class)
+        public ResponseEntity<Map<String, Object>> handleJacksonException(
+                        JacksonException exception) {
+                return buildResponse(
+                                HttpStatus.BAD_REQUEST,
+                                "Invalid request data");
         }
 
         @ExceptionHandler({
