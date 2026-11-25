@@ -70,4 +70,38 @@ class JwtServiceTest {
     void isTokenValid_shouldReturnFalseForInvalidToken() {
         assertFalse(jwtService.isTokenValid("not-a-valid-jwt"));
     }
+
+    @Test
+    void generateAccessToken_shouldContainProviderId() {
+        UUID userId = UUID.randomUUID();
+        UUID providerId = UUID.randomUUID();
+
+        String token = jwtService.generateAccessToken(
+                userId,
+                "provider@example.com",
+                List.of("SERVICE_PROVIDER"),
+                providerId
+        );
+
+        Claims claims = jwtService.parseToken(token);
+
+        assertEquals(userId.toString(), claims.getSubject());
+        assertEquals(providerId.toString(), claims.get("providerId"));
+    }
+
+    @Test
+    void generateAccessToken_shouldNotContainProviderIdForRegularUser() {
+        UUID userId = UUID.randomUUID();
+
+        String token = jwtService.generateAccessToken(
+                userId,
+                "user@example.com",
+                List.of("PHOTOGRAPHER")
+        );
+
+        Claims claims = jwtService.parseToken(token);
+
+        assertEquals(userId.toString(), claims.getSubject());
+        assertFalse(claims.containsKey("providerId"));
+    }
 }
