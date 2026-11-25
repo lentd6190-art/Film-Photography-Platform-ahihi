@@ -14,11 +14,13 @@ import com.lentd6190art.fpp.resource.repository.CreativeSpaceRepository;
 import com.lentd6190art.fpp.resource.repository.EquipmentRepository;
 import com.lentd6190art.fpp.resource.dto.request.EquipmentAttributes;
 import com.lentd6190art.fpp.resource.dto.request.ConsumableAttributes;
+import com.lentd6190art.fpp.resource.config.ProviderAuthenticationDetails;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 import tools.jackson.databind.ObjectMapper;
+import org.springframework.security.core.Authentication;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
@@ -43,6 +45,7 @@ class ResourceServiceUpdateTest {
     private EquipmentRepository equipmentRepository;
     private ConsumableRepository consumableRepository;
     private ObjectMapper objectMapper;
+    private Authentication authentication;
 
     @BeforeEach
     void setUp() {
@@ -50,6 +53,7 @@ class ResourceServiceUpdateTest {
         equipmentRepository = mock(EquipmentRepository.class);
         consumableRepository = mock(ConsumableRepository.class);
         objectMapper = mock(ObjectMapper.class);
+        authentication = mock(Authentication.class);
 
         resourceService = new ResourceService(
                 creativeSpaceRepository,
@@ -58,11 +62,17 @@ class ResourceServiceUpdateTest {
                 objectMapper);
     }
 
+    private void mockAuthentication(UUID providerId) {
+    when(authentication.getDetails())
+            .thenReturn(new ProviderAuthenticationDetails(providerId));
+}
+
     @Test
     void updateResource_shouldUpdateCreativeSpaceSuccessfully() {
         // Arrange
         UUID resourceId = UUID.randomUUID();
         UUID providerId = UUID.randomUUID();
+        mockAuthentication(providerId);
 
         OffsetDateTime createdAt = OffsetDateTime.parse("2026-01-01T10:00:00+07:00");
 
@@ -78,7 +88,7 @@ class ResourceServiceUpdateTest {
         existing.setHourlyPrice(new BigDecimal("100000"));
         existing.setStatus("ACTIVE");
 
-        when(creativeSpaceRepository.findById(resourceId))
+        when(creativeSpaceRepository.findByIdAndProviderId(resourceId, providerId))
                 .thenReturn(Optional.of(existing));
 
         CreativeSpaceAttributes attributes = new CreativeSpaceAttributes(
@@ -96,7 +106,6 @@ class ResourceServiceUpdateTest {
 
         ResourceRequest request = new ResourceRequest(
                 ResourceType.CREATIVE_SPACE,
-                providerId,
                 "Darkroom Studio Updated",
                 "Updated description",
                 Map.of("address", "123 Updated Street"));
@@ -108,7 +117,8 @@ class ResourceServiceUpdateTest {
         ResourceResponse response = resourceService.updateResource(
                 ResourceType.CREATIVE_SPACE,
                 resourceId,
-                request);
+                request,
+                authentication);
 
         // Assert
         assertEquals("Darkroom Studio Updated", response.name());
@@ -131,24 +141,14 @@ class ResourceServiceUpdateTest {
     }
 
     @Test
-    void updateResource_shouldRejectProviderIdChange() {
+    void updateResource_shouldRejectUpdatingResourceOfAnotherProvider() {
         UUID resourceId = UUID.randomUUID();
-        UUID originalProviderId = UUID.randomUUID();
-        UUID newProviderId = UUID.randomUUID();
+        UUID unauthorizedProviderId = UUID.randomUUID();
 
-        CreativeSpace existing = new CreativeSpace();
-        existing.setProviderId(originalProviderId);
-        existing.setName("Old Studio");
-        existing.setAddress("Old Address");
-        existing.setCapacity(5);
-        existing.setHourlyPrice(new BigDecimal("100000"));
-
-        when(creativeSpaceRepository.findById(resourceId))
-                .thenReturn(Optional.of(existing));
+        mockAuthentication(unauthorizedProviderId);
 
         ResourceRequest request = new ResourceRequest(
                 ResourceType.CREATIVE_SPACE,
-                newProviderId,
                 "Updated Studio",
                 "Updated description",
                 Map.of(
@@ -156,12 +156,18 @@ class ResourceServiceUpdateTest {
                         "capacity", 10,
                         "hourlyPrice", 200000));
 
+        when(creativeSpaceRepository.findByIdAndProviderId(
+                resourceId,
+                unauthorizedProviderId))
+                .thenReturn(Optional.empty());
+
         assertThrows(
-                IllegalArgumentException.class,
+                ResourceNotFoundException.class,
                 () -> resourceService.updateResource(
                         ResourceType.CREATIVE_SPACE,
                         resourceId,
-                        request));
+                        request,
+                        authentication));
     }
 
     @Test
@@ -169,19 +175,23 @@ class ResourceServiceUpdateTest {
         UUID resourceId = UUID.randomUUID();
         UUID providerId = UUID.randomUUID();
 
+        mockAuthentication(providerId);
+
         ResourceRequest request = new ResourceRequest(
                 ResourceType.EQUIPMENT,
-                providerId,
                 "Camera",
                 "Film camera",
                 Map.of("category", "CAMERA"));
 
-        assertThrows(
-                IllegalArgumentException.class,
-                () -> resourceService.updateResource(
-                        ResourceType.CREATIVE_SPACE,
-                        resourceId,
-                        request));
+        IllegalArgumentException exception = assertThrows(
+        IllegalArgumentException.class,
+        () -> resourceService.updateResource(
+                ResourceType.CREATIVE_SPACE,
+                resourceId,
+                request,
+                authentication));
+
+        assertEquals("Resource type in request does not match URL", exception.getMessage());
     }
 
     @Test
@@ -189,12 +199,15 @@ class ResourceServiceUpdateTest {
         UUID resourceId = UUID.randomUUID();
         UUID providerId = UUID.randomUUID();
 
-        when(creativeSpaceRepository.findById(resourceId))
+        mockAuthentication(providerId);
+
+        when(creativeSpaceRepository.findByIdAndProviderId(
+                resourceId,
+                providerId))
                 .thenReturn(Optional.empty());
 
         ResourceRequest request = new ResourceRequest(
                 ResourceType.CREATIVE_SPACE,
-                providerId,
                 "Updated Studio",
                 "Updated description",
                 Map.of(
@@ -207,7 +220,8 @@ class ResourceServiceUpdateTest {
                 () -> resourceService.updateResource(
                         ResourceType.CREATIVE_SPACE,
                         resourceId,
-                        request));
+                        request,
+                        authentication));
     }
 
     @Test
@@ -222,7 +236,11 @@ class ResourceServiceUpdateTest {
         existing.setCapacity(5);
         existing.setHourlyPrice(new BigDecimal("100000"));
 
-        when(creativeSpaceRepository.findById(resourceId))
+        mockAuthentication(providerId);
+
+        when(creativeSpaceRepository.findByIdAndProviderId(
+                resourceId,
+                providerId))
                 .thenReturn(Optional.of(existing));
 
         CreativeSpaceAttributes attributes = new CreativeSpaceAttributes(
@@ -240,7 +258,6 @@ class ResourceServiceUpdateTest {
 
         ResourceRequest request = new ResourceRequest(
                 ResourceType.CREATIVE_SPACE,
-                providerId,
                 "Updated Studio",
                 "Updated description",
                 Map.of("address", "Updated Address"));
@@ -250,7 +267,8 @@ class ResourceServiceUpdateTest {
                 () -> resourceService.updateResource(
                         ResourceType.CREATIVE_SPACE,
                         resourceId,
-                        request));
+                        request,
+                        authentication));
     }
 
     @Test
@@ -271,8 +289,13 @@ class ResourceServiceUpdateTest {
         existing.setCapacity(5);
         existing.setHourlyPrice(new BigDecimal("150000"));
 
-        when(creativeSpaceRepository.findById(resourceId))
+        mockAuthentication(providerId);
+
+        when(creativeSpaceRepository.findByIdAndProviderId(
+                resourceId,
+                providerId))
                 .thenReturn(Optional.of(existing));
+
         when(creativeSpaceRepository.save(existing))
                 .thenReturn(existing);
 
@@ -291,7 +314,6 @@ class ResourceServiceUpdateTest {
 
         ResourceRequest request = new ResourceRequest(
                 ResourceType.CREATIVE_SPACE,
-                providerId,
                 "Updated Studio",
                 "Updated description",
                 Map.of("address", "Updated Address"));
@@ -299,7 +321,8 @@ class ResourceServiceUpdateTest {
         ResourceResponse response = resourceService.updateResource(
                 ResourceType.CREATIVE_SPACE,
                 resourceId,
-                request);
+                request,
+                authentication);
 
         assertEquals(
                 new BigDecimal("150000"),
@@ -327,7 +350,11 @@ class ResourceServiceUpdateTest {
         existing.setStatus("AVAILABLE");
         existing.setRentalPrice(new BigDecimal("100000"));
 
-        when(equipmentRepository.findById(resourceId))
+        mockAuthentication(providerId);
+
+        when(equipmentRepository.findByIdAndProviderId(
+                resourceId,
+                providerId))
                 .thenReturn(Optional.of(existing));
 
         EquipmentAttributes attributes = new EquipmentAttributes(
@@ -348,7 +375,6 @@ class ResourceServiceUpdateTest {
 
         ResourceRequest request = new ResourceRequest(
                 ResourceType.EQUIPMENT,
-                providerId,
                 "Updated Camera",
                 "Updated camera description",
                 Map.of("category", "CAMERA"));
@@ -356,7 +382,8 @@ class ResourceServiceUpdateTest {
         ResourceResponse response = resourceService.updateResource(
                 ResourceType.EQUIPMENT,
                 resourceId,
-                request);
+                request,
+                authentication);
 
         assertEquals("Updated Camera", response.name());
         assertEquals("Updated camera description", response.description());
@@ -396,8 +423,13 @@ class ResourceServiceUpdateTest {
         existing.setStatus("AVAILABLE");
         existing.setRentalPrice(new BigDecimal("100000"));
 
-        when(equipmentRepository.findById(resourceId))
+        mockAuthentication(providerId);
+
+        when(equipmentRepository.findByIdAndProviderId(
+                resourceId,
+                providerId))
                 .thenReturn(Optional.of(existing));
+
         when(equipmentRepository.save(existing)).thenReturn(existing);
 
         when(objectMapper.convertValue(
@@ -413,7 +445,6 @@ class ResourceServiceUpdateTest {
 
         ResourceRequest request = new ResourceRequest(
                 ResourceType.EQUIPMENT,
-                providerId,
                 "Updated Canon Camera",
                 "Updated description",
                 Map.of("category", "CAMERA"));
@@ -421,13 +452,16 @@ class ResourceServiceUpdateTest {
         ResourceResponse response = resourceService.updateResource(
                 ResourceType.EQUIPMENT,
                 resourceId,
-                request);
+                request,
+                authentication);
 
         assertEquals("GOOD", response.attributes().get("equipmentCondition"));
         assertEquals("AVAILABLE", response.status());
         assertEquals(
                 new BigDecimal("100000"),
                 response.attributes().get("rentalPrice"));
+        assertEquals("Canon", response.attributes().get("brand"));
+        assertEquals("AE-1", response.attributes().get("model"));
 
         verify(equipmentRepository).save(existing);
     }
@@ -447,7 +481,11 @@ class ResourceServiceUpdateTest {
         existing.setStatus("AVAILABLE");
         existing.setRentalPrice(new BigDecimal("100000"));
 
-        when(equipmentRepository.findById(resourceId))
+        mockAuthentication(providerId);
+
+        when(equipmentRepository.findByIdAndProviderId(
+                resourceId,
+                providerId))
                 .thenReturn(Optional.of(existing));
 
         when(objectMapper.convertValue(
@@ -463,7 +501,6 @@ class ResourceServiceUpdateTest {
 
         ResourceRequest request = new ResourceRequest(
                 ResourceType.EQUIPMENT,
-                providerId,
                 "Canon Camera",
                 "Film camera",
                 Map.of("category", "CAMERA"));
@@ -473,7 +510,8 @@ class ResourceServiceUpdateTest {
                 () -> resourceService.updateResource(
                         ResourceType.EQUIPMENT,
                         resourceId,
-                        request));
+                        request,
+                        authentication));
 
         assertEquals(
                 "Rental price must not be negative",
@@ -497,7 +535,11 @@ class ResourceServiceUpdateTest {
         existing.setStatus("AVAILABLE");
         existing.setRentalPrice(new BigDecimal("100000"));
 
-        when(equipmentRepository.findById(resourceId))
+        mockAuthentication(providerId);
+
+        when(equipmentRepository.findByIdAndProviderId(
+                resourceId,
+                providerId))
                 .thenReturn(Optional.of(existing));
 
         when(objectMapper.convertValue(
@@ -513,7 +555,6 @@ class ResourceServiceUpdateTest {
 
         ResourceRequest request = new ResourceRequest(
                 ResourceType.EQUIPMENT,
-                providerId,
                 "Canon Camera",
                 "Film camera",
                 Map.of("category", "CAMERA"));
@@ -523,7 +564,8 @@ class ResourceServiceUpdateTest {
                 () -> resourceService.updateResource(
                         ResourceType.EQUIPMENT,
                         resourceId,
-                        request));
+                        request,
+                        authentication));
 
         assertEquals("Invalid equipment condition", exception.getMessage());
 
@@ -545,7 +587,11 @@ class ResourceServiceUpdateTest {
         existing.setStatus("AVAILABLE");
         existing.setRentalPrice(new BigDecimal("100000"));
 
-        when(equipmentRepository.findById(resourceId))
+        mockAuthentication(providerId);
+
+        when(equipmentRepository.findByIdAndProviderId(
+                resourceId,
+                providerId))
                 .thenReturn(Optional.of(existing));
 
         when(objectMapper.convertValue(
@@ -561,7 +607,6 @@ class ResourceServiceUpdateTest {
 
         ResourceRequest request = new ResourceRequest(
                 ResourceType.EQUIPMENT,
-                providerId,
                 "Canon Camera",
                 "Film camera",
                 Map.of("category", "CAMERA"));
@@ -571,7 +616,8 @@ class ResourceServiceUpdateTest {
                 () -> resourceService.updateResource(
                         ResourceType.EQUIPMENT,
                         resourceId,
-                        request));
+                        request,
+                        authentication));
 
         assertEquals("Invalid equipment status", exception.getMessage());
 
@@ -599,9 +645,15 @@ class ResourceServiceUpdateTest {
         existing.setUnit("roll");
         existing.setExpiryDate(LocalDate.of(2027, 1, 1));
         existing.setStatus("ACTIVE");
+        existing.setCategory("Film");
 
-        when(consumableRepository.findById(resourceId))
+        mockAuthentication(providerId);
+
+        when(consumableRepository.findByIdAndProviderId(
+                resourceId,
+                providerId))
                 .thenReturn(Optional.of(existing));
+
         when(consumableRepository.save(existing)).thenReturn(existing);
 
         when(objectMapper.convertValue(
@@ -613,11 +665,11 @@ class ResourceServiceUpdateTest {
                         new BigDecimal("75000"),
                         "box",
                         LocalDate.of(2028, 1, 1),
-                        "ACTIVE"));
+                        "ACTIVE",
+                        "Film"));
 
         ResourceRequest request = new ResourceRequest(
                 ResourceType.CONSUMABLE,
-                providerId,
                 "Updated Film",
                 "Updated film description",
                 Map.of("stockQuantity", 50));
@@ -625,7 +677,8 @@ class ResourceServiceUpdateTest {
         ResourceResponse response = resourceService.updateResource(
                 ResourceType.CONSUMABLE,
                 resourceId,
-                request);
+                request,
+                authentication);
 
         assertEquals("Updated Film", response.name());
         assertEquals("Updated film description", response.description());
@@ -666,9 +719,15 @@ class ResourceServiceUpdateTest {
         existing.setUnit("roll");
         existing.setExpiryDate(LocalDate.of(2027, 6, 1));
         existing.setStatus("ACTIVE");
+        existing.setCategory("Film");
 
-        when(consumableRepository.findById(resourceId))
+        mockAuthentication(providerId);
+
+        when(consumableRepository.findByIdAndProviderId(
+                resourceId,
+                providerId))
                 .thenReturn(Optional.of(existing));
+
         when(consumableRepository.save(existing)).thenReturn(existing);
 
         when(objectMapper.convertValue(
@@ -680,11 +739,11 @@ class ResourceServiceUpdateTest {
                         null,
                         null,
                         null,
+                        null,
                         null));
 
         ResourceRequest request = new ResourceRequest(
                 ResourceType.CONSUMABLE,
-                providerId,
                 "Updated Kodak Film",
                 "Updated description",
                 Map.of());
@@ -692,7 +751,8 @@ class ResourceServiceUpdateTest {
         ResourceResponse response = resourceService.updateResource(
                 ResourceType.CONSUMABLE,
                 resourceId,
-                request);
+                request,
+                authentication);
 
         assertEquals(20, response.attributes().get("stockQuantity"));
         assertEquals(5, response.attributes().get("reorderLevel"));
@@ -700,6 +760,9 @@ class ResourceServiceUpdateTest {
                 new BigDecimal("80000"),
                 response.attributes().get("unitPrice"));
         assertEquals("roll", response.attributes().get("unit"));
+        assertEquals(
+                LocalDate.of(2027, 6, 1),
+                response.attributes().get("expiryDate"));
         assertEquals("ACTIVE", response.status());
 
         verify(consumableRepository).save(existing);
@@ -719,8 +782,13 @@ class ResourceServiceUpdateTest {
         existing.setUnitPrice(new BigDecimal("80000"));
         existing.setUnit("roll");
         existing.setStatus("ACTIVE");
+        existing.setCategory("Film");
 
-        when(consumableRepository.findById(resourceId))
+        mockAuthentication(providerId);
+
+        when(consumableRepository.findByIdAndProviderId(
+                resourceId,
+                providerId))
                 .thenReturn(Optional.of(existing));
 
         when(objectMapper.convertValue(
@@ -732,11 +800,11 @@ class ResourceServiceUpdateTest {
                         null,
                         null,
                         null,
+                        null,
                         null));
 
         ResourceRequest request = new ResourceRequest(
                 ResourceType.CONSUMABLE,
-                providerId,
                 "Kodak Film",
                 "35mm film",
                 Map.of());
@@ -746,7 +814,8 @@ class ResourceServiceUpdateTest {
                 () -> resourceService.updateResource(
                         ResourceType.CONSUMABLE,
                         resourceId,
-                        request));
+                        request,
+                        authentication));
 
         verify(consumableRepository, never()).save(any());
     }
@@ -765,8 +834,13 @@ class ResourceServiceUpdateTest {
         existing.setUnitPrice(new BigDecimal("80000"));
         existing.setUnit("roll");
         existing.setStatus("ACTIVE");
+        existing.setCategory("Film");
 
-        when(consumableRepository.findById(resourceId))
+        mockAuthentication(providerId);
+
+        when(consumableRepository.findByIdAndProviderId(
+                resourceId,
+                providerId))
                 .thenReturn(Optional.of(existing));
 
         when(objectMapper.convertValue(
@@ -778,11 +852,11 @@ class ResourceServiceUpdateTest {
                         null,
                         null,
                         null,
+                        null,
                         null));
 
         ResourceRequest request = new ResourceRequest(
                 ResourceType.CONSUMABLE,
-                providerId,
                 "Kodak Film",
                 "35mm film",
                 Map.of());
@@ -792,7 +866,8 @@ class ResourceServiceUpdateTest {
                 () -> resourceService.updateResource(
                         ResourceType.CONSUMABLE,
                         resourceId,
-                        request));
+                        request,
+                        authentication));
 
         verify(consumableRepository, never()).save(any());
     }
@@ -811,8 +886,13 @@ class ResourceServiceUpdateTest {
         existing.setUnitPrice(new BigDecimal("80000"));
         existing.setUnit("roll");
         existing.setStatus("ACTIVE");
+        existing.setCategory("Film");
 
-        when(consumableRepository.findById(resourceId))
+        mockAuthentication(providerId);
+
+        when(consumableRepository.findByIdAndProviderId(
+                resourceId,
+                providerId))
                 .thenReturn(Optional.of(existing));
 
         when(objectMapper.convertValue(
@@ -824,11 +904,11 @@ class ResourceServiceUpdateTest {
                         new BigDecimal("-1000"),
                         null,
                         null,
+                        null,
                         null));
 
         ResourceRequest request = new ResourceRequest(
                 ResourceType.CONSUMABLE,
-                providerId,
                 "Kodak Film",
                 "35mm film",
                 Map.of());
@@ -838,7 +918,8 @@ class ResourceServiceUpdateTest {
                 () -> resourceService.updateResource(
                         ResourceType.CONSUMABLE,
                         resourceId,
-                        request));
+                        request,
+                        authentication));
 
         verify(consumableRepository, never()).save(any());
     }
