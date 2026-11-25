@@ -1,3 +1,4 @@
+from pydantic import model_validator
 from datetime import datetime, date
 from enum import Enum
 from pydantic import BaseModel, Field
@@ -150,3 +151,63 @@ class ForecastResponse(BaseModel):
     predictions: List[ForecastDataPoint]
     evaluation: ForecastEvaluation
     metadata: Dict[str, Any]
+
+
+# ==========================================
+# 6. Dynamic Pricing Recommendation Schemas (FPP-53)
+# ==========================================
+
+class HistoricalPricingPoint(BaseModel):
+    period: str = Field(..., description="Kỳ thời gian (VD: 2026-W45 hoặc 2026-11-20)")
+    price: float = Field(..., gt=0, description="Giá áp dụng trong kỳ lịch sử")
+    demand_count: int = Field(..., ge=0, description="Số lượt booking ghi nhận")
+
+class PricingRecommendationRequest(BaseModel):
+    resource_category: ForecastResourceCategory = Field(..., description="CREATIVE_SPACE, EQUIPMENT, SERVICE_PACKAGE")
+    resource_id: str = Field(..., description="ID của không gian, thiết bị hoặc gói dịch vụ")
+    resource_name: Optional[str] = Field(None, description="Tên hiển thị của tài nguyên")
+    resource_subtype: Optional[str] = Field(None, description="Loại chi tiết (VD: Daylight Studio, Cinema Camera...)")
+    time_period: str = Field(..., description="Khoảng thời gian cần gợi ý giá (VD: 2026-12-20_weekend)")
+    current_price: float = Field(..., gt=0, description="Giá hiện tại của provider")
+    
+    # Ràng buộc an toàn giá (có thể truyền theo cấu hình từng resource)
+    min_price: float = Field(..., gt=0, description="Giá sàn tối thiểu cho phép")
+    max_price: float = Field(..., gt=0, description="Giá trần tối đa cho phép")
+    
+    # Dữ liệu vận hành & dự báo (tùy chọn - nếu None service sẽ gọi API backend & forecaster)
+    resource_utilization: Optional[float] = Field(None, ge=0.0, le=1.0, description="Tỷ lệ lấp đầy (0.0 - 1.0)")
+    current_demand: Optional[int] = Field(None, ge=0, description="Nhu cầu đặt lịch hiện tại")
+    forecasted_demand: Optional[float] = Field(None, ge=0.0, description="Nhu cầu dự báo từ module FPP-52")
+    historical_data: Optional[List[HistoricalPricingPoint]] = Field(
+        default=None, description="Dữ liệu giá và nhu cầu lịch sử"
+    )
+
+    @model_validator(mode="after")
+    def check_min_max_bounds(self):
+        if self.min_price > self.max_price:
+            raise ValueError("min_price không được lớn hơn max_price")
+        if self.current_price < 0:
+            raise ValueError("current_price không được âm")
+        return self
+
+class PricingIndicators(BaseModel):
+    utilization_rate: float
+    historical_avg_demand: float
+    historical_avg_price: float
+    effective_demand: float
+    demand_ratio: float
+    demand_level: str = Field(..., description="HIGH | NORMAL | LOW | INSUFFICIENT_DATA")
+    forecast_used: bool
+
+class PricingRecommendationResponse(BaseModel):
+    resource_id: str
+    resource_name: Optional[str] = None
+    resource_category: ForecastResourceCategory
+    time_period: str
+    current_price: float
+    recommended_price: float
+    recommended_adjustment_amount: float
+    recommended_adjustment_pct: float
+    indicators: PricingIndicators
+    recommendation_reason: str
+    auto_applied: bool = Field(default=False, description="Luôn False: chỉ gợi ý, không tự sửa giá provider")

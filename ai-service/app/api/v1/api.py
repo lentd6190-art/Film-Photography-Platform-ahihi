@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.api.v1.endpoints import restoration, recommendation, assistant, rag, allocation, forecasting
+from app.api.v1.endpoints import restoration, recommendation, assistant, rag, allocation, forecasting, pricing
 
 api_router = APIRouter()
 
@@ -32,4 +32,9 @@ api_router.include_router(
     forecasting.router,
     prefix="/forecasting",
     tags=["Demand Forecasting"]
+)
+api_router.include_router(
+    pricing.router,
+    prefix="/pricing",
+    tags=["Dynamic Pricing"]
 )
