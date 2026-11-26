@@ -31,7 +31,21 @@ export default function DashboardLayout({
       ? [{ href: "/dashboard/admin", label: "Admin Dashboard" }]
       : []),
     ...(isProvider
-      ? [{ href: "/dashboard/provider", label: "Provider Dashboard" }]
+      ? [
+          { href: "/dashboard/provider", label: "Provider Dashboard" },
+          {
+            href: "/dashboard/provider/creative-spaces",
+            label: "Creative Spaces",
+          },
+          {
+            href: "/dashboard/provider/equipment",
+            label: "Equipment Management",
+          },
+          {
+            href: "/dashboard/provider/consumables",
+            label: "Consumable Management",
+          },
+        ]
       : []),
   ];
 
