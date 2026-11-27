@@ -36,17 +36,17 @@ const maintenanceLabels: Record<Equipment["maintenanceStatus"], string> = {
 };
 
 const statusStyles: Record<Equipment["status"], string> = {
-  AVAILABLE: "bg-green-100 text-green-700",
-  RENTED: "bg-blue-100 text-blue-700",
-  MAINTENANCE: "bg-orange-100 text-orange-700",
-  INACTIVE: "bg-gray-100 text-gray-600",
+  AVAILABLE: "border border-green-200 bg-green-50 text-green-700",
+  RENTED: "border border-[#FFD6B8] bg-[#FFF1E5] text-[#B94B00]",
+  MAINTENANCE: "border border-amber-200 bg-amber-50 text-amber-700",
+  INACTIVE: "border border-gray-200 bg-gray-100 text-gray-600",
 };
 
 function InfoItem({ label, value }: { label: string; value: string }) {
   return (
     <div>
       <p className="text-sm text-gray-500">{label}</p>
-      <p className="mt-1 whitespace-pre-wrap font-medium text-gray-900">
+      <p className="mt-1 whitespace-pre-wrap font-medium text-[#49382D]">
         {value || "Chưa cập nhật"}
       </p>
     </div>
@@ -112,7 +112,7 @@ function EquipmentDetailContent() {
         <div className="mx-auto max-w-5xl space-y-6">
           <Link
             href="/dashboard/provider/equipment"
-            className="text-sm font-medium text-blue-600 hover:text-blue-700"
+            className="text-sm font-medium text-[#806F62] hover:text-[#49382D]"
           >
             ← Quay lại danh sách thiết bị
           </Link>
@@ -127,7 +127,7 @@ function EquipmentDetailContent() {
             </div>
           ) : !equipment ? (
             <div className="rounded-xl border bg-white p-10 text-center">
-              <h2 className="font-semibold text-gray-900">
+              <h2 className="font-semibold text-[#49382D]">
                 Không tìm thấy thiết bị
               </h2>
               <p className="mt-2 text-sm text-gray-500">
@@ -136,10 +136,10 @@ function EquipmentDetailContent() {
             </div>
           ) : (
             <>
-              <section className="flex flex-col justify-between gap-4 rounded-xl border bg-white p-6 shadow-sm sm:flex-row sm:items-center">
+              <section className="flex flex-col justify-between gap-4 rounded-2xl border border-[#E9DED2] bg-white p-6 shadow-sm sm:flex-row sm:items-center">
                 <div>
                   <div className="flex flex-wrap items-center gap-3">
-                    <h1 className="text-2xl font-bold text-gray-900">
+                    <h1 className="text-2xl font-bold text-[#49382D]">
                       {equipment.name}
                     </h1>
                     <span className={`rounded-full px-3 py-1 text-xs font-semibold ${statusStyles[equipment.status]}`}>
@@ -155,29 +155,29 @@ function EquipmentDetailContent() {
 
                 <Link
                   href={`/dashboard/provider/equipment/${equipment.id}/edit`}
-                  className="rounded-lg bg-blue-600 px-4 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-700"
+                  className="rounded-xl bg-[#FF5A00] px-4 py-2.5 text-center text-sm font-semibold text-white transition-colors hover:bg-[#E94F00]"
                 >
                   Chỉnh sửa thiết bị
                 </Link>
               </section>
 
               <section className="grid gap-4 sm:grid-cols-2">
-                <div className="rounded-xl border bg-white p-5 shadow-sm">
+                <div className="rounded-2xl border border-[#E9DED2] bg-white p-5 shadow-sm">
                   <p className="text-sm text-gray-500">Giá thuê</p>
-                  <p className="mt-2 text-2xl font-bold text-blue-700">
+                  <p className="mt-2 text-2xl font-bold text-[#FF5A00]">
                     {formatPrice(equipment.rentalPrice)}
                   </p>
                 </div>
-                <div className="rounded-xl border bg-white p-5 shadow-sm">
+                <div className="rounded-2xl border border-[#E9DED2] bg-white p-5 shadow-sm">
                   <p className="text-sm text-gray-500">Tình trạng thiết bị</p>
-                  <p className="mt-2 text-2xl font-bold text-gray-900">
+                  <p className="mt-2 text-2xl font-bold text-[#49382D]">
                     {conditionLabels[equipment.condition]}
                   </p>
                 </div>
               </section>
 
-              <section className="space-y-5 rounded-xl border bg-white p-6 shadow-sm">
-                <h2 className="border-b pb-3 text-lg font-semibold text-gray-900">
+              <section className="space-y-5 rounded-2xl border border-[#E9DED2] bg-white p-6 shadow-sm">
+                <h2 className="border-b border-[#E9DED2] pb-3 text-lg font-semibold text-[#49382D]">
                   Thông tin cơ bản
                 </h2>
                 <div className="grid gap-5 sm:grid-cols-2">
@@ -193,8 +193,8 @@ function EquipmentDetailContent() {
                 </div>
               </section>
 
-              <section className="space-y-5 rounded-xl border bg-white p-6 shadow-sm">
-                <h2 className="border-b pb-3 text-lg font-semibold text-gray-900">
+              <section className="space-y-5 rounded-2xl border border-[#E9DED2] bg-white p-6 shadow-sm">
+                <h2 className="border-b border-[#E9DED2] pb-3 text-lg font-semibold text-[#49382D]">
                   Thông tin bảo trì
                 </h2>
                 <div className="grid gap-5 sm:grid-cols-2">
@@ -217,8 +217,8 @@ function EquipmentDetailContent() {
                 </div>
               </section>
 
-              <section className="space-y-5 rounded-xl border bg-white p-6 shadow-sm">
-                <h2 className="border-b pb-3 text-lg font-semibold text-gray-900">
+              <section className="space-y-5 rounded-2xl border border-[#E9DED2] bg-white p-6 shadow-sm">
+                <h2 className="border-b border-[#E9DED2] pb-3 text-lg font-semibold text-[#49382D]">
                   Thông tin bổ sung
                 </h2>
 
@@ -229,14 +229,14 @@ function EquipmentDetailContent() {
                       {equipment.packageCompatibility.map((item, index) => (
                         <span
                           key={`${item}-${index}`}
-                          className="rounded-full bg-blue-50 px-3 py-1 text-sm text-blue-700"
+                          className="rounded-full border border-[#FFD6B8] bg-[#FFF1E5] px-3 py-1 text-sm text-[#B94B00]"
                         >
                           {item}
                         </span>
                       ))}
                     </div>
                   ) : (
-                    <p className="mt-1 text-sm text-gray-700">Chưa có thông tin</p>
+                    <p className="mt-1 text-sm text-[#806F62]">Chưa có thông tin</p>
                   )}
                 </div>
 
@@ -250,7 +250,7 @@ function EquipmentDetailContent() {
                             href={image}
                             target="_blank"
                             rel="noreferrer"
-                            className="break-all text-sm text-blue-600 hover:underline"
+                            className="break-all text-sm text-[#B94B00] hover:underline"
                           >
                             {image}
                           </a>
@@ -258,15 +258,15 @@ function EquipmentDetailContent() {
                       ))}
                     </ul>
                   ) : (
-                    <p className="mt-1 text-sm text-gray-700">
+                    <p className="mt-1 text-sm text-[#806F62]">
                       Chưa có hình ảnh
                     </p>
                   )}
                 </div>
               </section>
 
-              <section className="rounded-xl border bg-white p-6 shadow-sm">
-                <h2 className="mb-4 text-lg font-semibold text-gray-900">
+              <section className="rounded-2xl border border-[#E9DED2] bg-white p-6 shadow-sm">
+                <h2 className="mb-4 text-lg font-semibold text-[#49382D]">
                   Lịch sử dữ liệu
                 </h2>
                 <div className="grid gap-4 sm:grid-cols-2">

@@ -1,10 +1,7 @@
-
-"use client";
-
-// Cung cấp bố cục chung cho Dashboard Admin và Service Provider.
+﻿"use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import type { ReactNode } from "react";
 
 import { useAuth } from "@/contexts/AuthContext";
@@ -14,19 +11,24 @@ interface DashboardLayoutProps {
   title: string;
 }
 
+interface DashboardLink {
+  href: string;
+  label: string;
+}
+
 export default function DashboardLayout({
   children,
   title,
 }: DashboardLayoutProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const { user, logout } = useAuth();
 
   const roles = user?.roles ?? [];
-
   const isAdmin = roles.includes("ADMINISTRATOR");
   const isProvider = roles.includes("SERVICE_PROVIDER");
 
-  const dashboardLinks = [
+  const dashboardLinks: DashboardLink[] = [
     ...(isAdmin
       ? [{ href: "/dashboard/admin", label: "Admin Dashboard" }]
       : []),
@@ -39,68 +41,131 @@ export default function DashboardLayout({
           },
           {
             href: "/dashboard/provider/equipment",
-            label: "Equipment Management",
+            label: "Equipment",
           },
           {
             href: "/dashboard/provider/consumables",
-            label: "Consumable Management",
+            label: "Consumables",
           },
         ]
       : []),
   ];
+
+  function isActive(href: string): boolean {
+    if (href === "/dashboard/provider") {
+      return pathname === href;
+    }
+
+    if (href === "/dashboard/admin") {
+      return pathname === href;
+    }
+
+    return pathname === href || pathname.startsWith(`${href}/`);
+  }
 
   function handleLogout() {
     logout();
     router.replace("/login");
   }
 
-  return (
-    <div className="flex min-h-screen bg-gray-100">
-      {/* Sidebar trên màn hình desktop */}
-      <aside className="hidden w-64 flex-col bg-slate-900 text-white md:flex">
-        <div className="border-b border-slate-700 p-6">
-          <h1 className="text-xl font-bold">Film Photography</h1>
-          <p className="mt-1 text-sm text-slate-400">
-            Management Portal
-          </p>
-        </div>
+  function renderNavigationLinks(mobile = false) {
+    return (
+      <>
+        <Link
+          href="/"
+          className={`block shrink-0 rounded-xl px-4 py-3 text-sm font-medium transition ${
+            pathname === "/"
+              ? "bg-orange-100 text-orange-700"
+              : "text-[#806F62] hover:bg-white hover:text-[#49382D]"
+          }`}
+        >
+          Trang chủ
+        </Link>
 
-        <nav className="flex-1 space-y-2 p-4">
-          <Link
-            href="/"
-            className="block rounded-lg px-4 py-3 text-slate-300 transition hover:bg-slate-800 hover:text-white"
-          >
-            Trang chủ
-          </Link>
+        {dashboardLinks.map((link) => {
+          const active = isActive(link.href);
 
-          {dashboardLinks.map((link) => (
+          return (
             <Link
               key={link.href}
               href={link.href}
-              className="block rounded-lg px-4 py-3 text-slate-300 transition hover:bg-slate-800 hover:text-white"
+              aria-current={active ? "page" : undefined}
+              className={`block shrink-0 rounded-xl px-4 py-3 text-sm font-medium transition ${
+                active
+                  ? "bg-orange-100 text-[#E94F00]"
+                  : "text-[#806F62] hover:bg-white hover:text-[#49382D]"
+              } ${mobile ? "whitespace-nowrap" : ""}`}
             >
               {link.label}
             </Link>
-          ))}
-        </nav>
+          );
+        })}
+      </>
+    );
+  }
 
-        <div className="border-t border-slate-700 p-4">
-          <p className="text-xs text-slate-400">Vai trò</p>
-          <p className="mt-1 break-words text-sm font-medium">
+  return (
+    <div className="flex min-h-screen bg-[#F8F1E7] text-[#49382D]">
+      {/* Desktop sidebar */}
+      <aside className="hidden w-72 shrink-0 flex-col border-r border-[#E9DED2] bg-[#FFF9F2] lg:flex">
+        <div className="border-b border-[#E9DED2] px-7 py-7">
+          <Link href="/" className="inline-block">
+            <span className="text-2xl font-extrabold tracking-tight text-[#FF5A00]">
+              FILM.
+            </span>
+            <span className="ml-2 text-lg font-bold text-[#49382D]">
+              Studio
+            </span>
+          </Link>
+
+          <p className="mt-2 text-xs font-medium tracking-[0.16em] text-[#A39487]">
+            FILM PHOTOGRAPHY PLATFORM
+          </p>
+
+          <div className="mt-5 inline-flex rounded-full bg-orange-100 px-3 py-1.5 text-xs font-semibold text-[#E94F00]">
+            Management Portal
+          </div>
+        </div>
+
+        <div className="px-5 pt-7">
+          <p className="mb-3 px-3 text-xs font-bold uppercase tracking-wider text-[#A39487]">
+            Menu chính
+          </p>
+
+          <nav className="space-y-1.5">
+            {renderNavigationLinks()}
+          </nav>
+        </div>
+
+        <div className="mt-auto border-t border-[#E9DED2] p-6">
+          <p className="text-xs font-semibold uppercase tracking-wider text-[#A39487]">
+            Vai trò tài khoản
+          </p>
+          <p className="mt-2 break-words text-sm font-semibold text-[#49382D]">
             {roles.join(", ") || "Chưa xác định"}
           </p>
         </div>
       </aside>
 
-      {/* Nội dung chính */}
+      {/* Main content */}
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="border-b border-gray-200 bg-white px-6 py-4">
+        <header className="sticky top-0 z-20 border-b border-[#E9DED2] bg-white/95 px-4 py-4 backdrop-blur sm:px-7 lg:px-10">
           <div className="flex items-center justify-between gap-4">
-            <div>
-              <h2 className="text-xl font-bold text-gray-900">
+            <div className="min-w-0">
+              <div className="mb-1 flex items-center gap-2 lg:hidden">
+                <span className="text-lg font-extrabold text-[#FF5A00]">
+                  FILM.
+                </span>
+                <span className="text-sm font-bold text-[#49382D]">
+                  Studio
+                </span>
+              </div>
+
+              <h1 className="truncate text-lg font-bold text-[#49382D] sm:text-xl">
                 {title}
-              </h2>
-              <p className="mt-1 text-sm text-gray-500">
+              </h1>
+
+              <p className="mt-1 hidden text-sm text-[#806F62] sm:block">
                 Xin chào, {user?.email ?? "Người dùng"}
               </p>
             </div>
@@ -108,35 +173,25 @@ export default function DashboardLayout({
             <button
               type="button"
               onClick={handleLogout}
-              className="shrink-0 rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-700"
+              className="shrink-0 rounded-xl border border-[#F2D2C0] bg-[#FFF5EF] px-3 py-2.5 text-sm font-semibold text-[#D94B43] transition hover:bg-[#FDE9DF] sm:px-4"
             >
               Đăng xuất
             </button>
           </div>
 
-          {/* Điều hướng trên màn hình nhỏ */}
-          <nav className="mt-4 flex flex-wrap gap-2 md:hidden">
-            <Link
-              href="/"
-              className="rounded-lg bg-gray-100 px-3 py-2 text-sm text-gray-700"
-            >
-              Trang chủ
-            </Link>
-
-            {dashboardLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="rounded-lg bg-gray-100 px-3 py-2 text-sm text-gray-700"
-              >
-                {link.label}
-              </Link>
-            ))}
+          {/* Mobile navigation */}
+          <nav
+            aria-label="Điều hướng chính"
+            className="mt-4 flex gap-2 overflow-x-auto pb-1 lg:hidden"
+          >
+            {renderNavigationLinks(true)}
           </nav>
         </header>
 
-        <main className="flex-1 p-6">
-          {children}
+        <main className="w-full flex-1 p-4 sm:p-7 lg:p-10">
+          <div className="mx-auto w-full max-w-[1440px]">
+            {children}
+          </div>
         </main>
       </div>
     </div>

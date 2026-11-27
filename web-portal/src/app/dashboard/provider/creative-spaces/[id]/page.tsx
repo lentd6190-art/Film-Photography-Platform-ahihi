@@ -17,9 +17,9 @@ import type {
 } from "@/types/creative-space";
 
 const inputClass =
-  "w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:cursor-not-allowed disabled:bg-gray-100";
+  "w-full rounded-xl border border-[#E9DED2] px-3 py-2 text-sm outline-none transition focus:border-[#FF5A00] focus:ring-2 focus:ring-[#FFE1CC] disabled:cursor-not-allowed disabled:bg-[#F8F1E7]";
 
-const labelClass = "mb-1.5 block text-sm font-medium text-gray-700";
+const labelClass = "mb-1.5 block text-sm font-medium text-[#49382D]";
 
 function parseList(value: string): string[] {
   return [...new Set(
@@ -144,7 +144,7 @@ function PreviewImage({ imageUrl }: { imageUrl: string }) {
   const [imageError, setImageError] = useState(false);
 
   return (
-    <div className="relative aspect-video overflow-hidden rounded-lg bg-gray-100">
+    <div className="relative aspect-video overflow-hidden rounded-xl bg-[#F8F1E7]">
       {!imageError ? (
         <Image
           src={imageUrl}
@@ -156,7 +156,7 @@ function PreviewImage({ imageUrl }: { imageUrl: string }) {
           onError={() => setImageError(true)}
         />
       ) : (
-        <div className="flex h-full flex-col items-center justify-center gap-2 text-gray-400">
+        <div className="flex h-full flex-col items-center justify-center gap-2 text-[#A39487]">
           <span className="text-3xl" aria-hidden="true">
             📷
           </span>
@@ -385,8 +385,8 @@ function CreativeSpaceDetailContent() {
       <DashboardLayout title="Chi tiết Creative Space">
         <div className="flex min-h-[300px] items-center justify-center">
           <div className="text-center">
-            <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-blue-600" />
-            <p className="mt-4 text-sm text-gray-500">
+            <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-[#E9DED2] border-t-[#FF5A00]" />
+            <p className="mt-4 text-sm text-[#806F62]">
               Đang tải thông tin Creative Space...
             </p>
           </div>
@@ -399,18 +399,18 @@ function CreativeSpaceDetailContent() {
   if (!space || !form) {
     return (
       <DashboardLayout title="Chi tiết Creative Space">
-        <div className="mx-auto max-w-3xl rounded-xl border border-gray-200 bg-white p-8 text-center shadow-sm">
-          <h1 className="text-xl font-semibold text-gray-900">
+        <div className="mx-auto max-w-3xl rounded-xl border border-[#E9DED2] bg-white p-8 text-center shadow-sm">
+          <h1 className="text-xl font-semibold text-[#49382D]">
             Không tìm thấy Creative Space
           </h1>
 
-          <p className="mt-2 text-sm text-gray-500">
+          <p className="mt-2 text-sm text-[#806F62]">
             {error || "Creative Space không tồn tại hoặc không thể truy cập."}
           </p>
 
           <Link
             href="/dashboard/provider/creative-spaces"
-            className="mt-6 inline-block rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-700"
+            className="mt-6 inline-block rounded-xl bg-[#FF5A00] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#E94F00]"
           >
             Quay lại danh sách
           </Link>
@@ -430,16 +430,16 @@ function CreativeSpaceDetailContent() {
           <div>
             <Link
               href="/dashboard/provider/creative-spaces"
-              className="text-sm text-blue-600 hover:underline"
+              className="text-sm text-[#FF5A00] hover:underline"
             >
               ← Quay lại danh sách
             </Link>
 
-            <h1 className="mt-3 text-2xl font-bold text-gray-900">
+            <h1 className="mt-3 text-2xl font-bold text-[#49382D]">
               Chi tiết Creative Space
             </h1>
 
-            <p className="mt-1 text-sm text-gray-500">
+            <p className="mt-1 text-sm text-[#806F62]">
               Xem và quản lý thông tin không gian của bạn.
             </p>
           </div>
@@ -447,7 +447,7 @@ function CreativeSpaceDetailContent() {
           <span
             className={`w-fit rounded-full px-3 py-1 text-sm font-medium ${
               isInactive
-                ? "bg-gray-100 text-gray-600"
+                ? "bg-[#F8F1E7] text-[#806F62]"
                 : "bg-green-100 text-green-700"
             }`}
           >
@@ -459,7 +459,7 @@ function CreativeSpaceDetailContent() {
         {error && (
           <div
             role="alert"
-            className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+            className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
           >
             {error}
           </div>
@@ -468,14 +468,14 @@ function CreativeSpaceDetailContent() {
         {success && (
           <div
             role="status"
-            className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700"
+            className="rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700"
           >
             {success}
           </div>
         )}
 
         {isInactive && (
-          <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
             Creative Space này đã ngừng hoạt động. Bạn chỉ có thể xem thông
             tin, không thể chỉnh sửa hoặc ngừng hoạt động thêm lần nữa.
           </div>
@@ -483,12 +483,12 @@ function CreativeSpaceDetailContent() {
 
         <form
           onSubmit={handleSave}
-          className="space-y-6 rounded-xl border border-gray-200 bg-white p-5 shadow-sm sm:p-7"
+          className="space-y-6 rounded-xl border border-[#E9DED2] bg-white p-5 shadow-sm sm:p-7"
         >
           <fieldset disabled={isInactive || isBusy} className="space-y-6">
             {/* Thông tin cơ bản */}
             <section className="space-y-4">
-              <h2 className="border-b pb-2 text-lg font-semibold text-gray-900">
+              <h2 className="border-b border-[#E9DED2] pb-2 text-lg font-semibold text-[#49382D]">
                 Thông tin cơ bản
               </h2>
 
@@ -603,7 +603,7 @@ function CreativeSpaceDetailContent() {
 
             {/* Đặc điểm không gian */}
             <section className="space-y-4">
-              <h2 className="border-b pb-2 text-lg font-semibold text-gray-900">
+              <h2 className="border-b border-[#E9DED2] pb-2 text-lg font-semibold text-[#49382D]">
                 Đặc điểm không gian
               </h2>
 
@@ -706,7 +706,7 @@ function CreativeSpaceDetailContent() {
 
             {/* Giá thuê và quy định */}
             <section className="space-y-4">
-              <h2 className="border-b pb-2 text-lg font-semibold text-gray-900">
+              <h2 className="border-b border-[#E9DED2] pb-2 text-lg font-semibold text-[#49382D]">
                 Giá thuê và quy định
               </h2>
 
@@ -800,7 +800,7 @@ function CreativeSpaceDetailContent() {
 
             {/* Hình ảnh */}
             <section className="space-y-4">
-              <h2 className="border-b pb-2 text-lg font-semibold text-gray-900">
+              <h2 className="border-b border-[#E9DED2] pb-2 text-lg font-semibold text-[#49382D]">
                 Hình ảnh Creative Space
               </h2>
 
@@ -820,7 +820,7 @@ function CreativeSpaceDetailContent() {
                   placeholder="Nhập các URL, phân cách bằng dấu phẩy"
                 />
 
-                <p className="mt-2 text-xs text-gray-500">
+                <p className="mt-2 text-xs text-[#806F62]">
                   Chỉ chấp nhận URL bắt đầu bằng http:// hoặc https://.
                   Hiện tại chưa hỗ trợ tải ảnh trực tiếp từ máy tính.
                 </p>
@@ -829,7 +829,7 @@ function CreativeSpaceDetailContent() {
               {invalidImageUrls.length > 0 && (
                 <div
                   role="alert"
-                  className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700"
+                  className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700"
                 >
                   <p className="font-medium">
                     Có {invalidImageUrls.length} URL không hợp lệ:
@@ -845,10 +845,10 @@ function CreativeSpaceDetailContent() {
               {validImageUrls.length > 0 && (
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-semibold text-gray-800">
+                    <h3 className="text-sm font-semibold text-[#49382D]">
                       Xem trước hình ảnh
                     </h3>
-                    <span className="text-xs text-gray-500">
+                    <span className="text-xs text-[#806F62]">
                       {validImageUrls.length} ảnh hợp lệ
                     </span>
                   </div>
@@ -857,7 +857,7 @@ function CreativeSpaceDetailContent() {
                     {validImageUrls.map((url, index) => (
                       <div key={`${url}-${index}`} className="space-y-2">
                         <PreviewImage imageUrl={url} />
-                        <p className="truncate text-xs text-gray-500">
+                        <p className="truncate text-xs text-[#806F62]">
                           Hình ảnh {index + 1}: {url}
                         </p>
                       </div>
@@ -869,12 +869,12 @@ function CreativeSpaceDetailContent() {
           </fieldset>
 
           {/* Nút thao tác */}
-          <div className="flex flex-col gap-3 border-t pt-5 sm:flex-row sm:justify-between">
+          <div className="flex flex-col gap-3 border-t border-[#E9DED2] pt-5 sm:flex-row sm:justify-between">
             <button
               type="button"
               onClick={handleDeactivate}
               disabled={isInactive || isBusy}
-              className="rounded-lg border border-red-300 px-5 py-2.5 text-sm font-medium text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded-xl border border-red-300 px-5 py-2.5 text-sm font-medium text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isDeactivating
                 ? "Đang xử lý..."
@@ -886,7 +886,7 @@ function CreativeSpaceDetailContent() {
             <div className="flex flex-col gap-3 sm:flex-row">
               <Link
                 href="/dashboard/provider/creative-spaces"
-                className="rounded-lg border border-gray-300 px-5 py-2.5 text-center text-sm font-medium text-gray-700 hover:bg-gray-50"
+                className="rounded-xl border border-[#E9DED2] px-5 py-2.5 text-center text-sm font-medium text-[#49382D] hover:bg-[#FFF9F2]"
               >
                 Quay lại
               </Link>
@@ -894,7 +894,7 @@ function CreativeSpaceDetailContent() {
               <button
                 type="submit"
                 disabled={isInactive || isBusy || invalidImageUrls.length > 0}
-                className="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                className="rounded-xl bg-[#FF5A00] px-5 py-2.5 text-sm font-medium text-white transition hover:bg-[#E94F00] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {isSaving ? "Đang lưu..." : "Lưu thay đổi"}
               </button>
@@ -902,7 +902,7 @@ function CreativeSpaceDetailContent() {
           </div>
         </form>
 
-        <div className="text-xs text-gray-400">
+        <div className="text-xs text-[#A39487]">
           Ngày tạo: {formatDate(space.createdAt)}
           {" · "}
           Cập nhật lần cuối: {formatDate(space.updatedAt)}

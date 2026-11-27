@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { useState, type FormEvent } from "react";
@@ -87,31 +87,31 @@ export default function CreateConsumablePage() {
           <div>
             <Link
               href="/dashboard/provider/consumables"
-              className="text-sm font-medium text-blue-600 hover:text-blue-700"
+              className="text-sm font-medium text-[#FF5A00] hover:text-[#E94F00]"
             >
               ← Quay lại danh sách vật tư
             </Link>
 
-            <h1 className="mt-4 text-2xl font-bold text-gray-900">
+            <h1 className="mt-4 text-2xl font-bold text-[#49382D]">
               Thêm vật tư tiêu hao mới
             </h1>
 
-            <p className="mt-1 text-sm text-gray-500">
+            <p className="mt-1 text-sm text-[#806F62]">
               Nhập thông tin và thiết lập mức tồn kho cho vật tư.
             </p>
           </div>
 
           <form
             onSubmit={handleSubmit}
-            className="space-y-6 rounded-xl border border-gray-200 bg-white p-6 shadow-sm"
+            className="space-y-6 rounded-xl border border-[#E9DED2] bg-white p-6 shadow-sm"
           >
             <section className="space-y-4">
-              <h2 className="border-b border-gray-100 pb-3 text-lg font-semibold text-gray-900">
+              <h2 className="border-b border-[#E9DED2] pb-3 text-lg font-semibold text-[#49382D]">
                 Thông tin cơ bản
               </h2>
 
               <div>
-                <label htmlFor="name" className="mb-1 block text-sm font-medium text-gray-700">
+                <label htmlFor="name" className="mb-1 block text-sm font-medium text-[#49382D]">
                   Tên vật tư *
                 </label>
                 <input
@@ -121,12 +121,12 @@ export default function CreateConsumablePage() {
                   required
                   maxLength={150}
                   placeholder="Ví dụ: Film Kodak Portra 400"
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                  className="w-full rounded-lg border border-[#E9DED2] px-3 py-2 text-sm outline-none focus:border-[#FF5A00] focus:ring-2 focus:ring-[#FF5A00]/15"
                 />
               </div>
 
               <div>
-                <label htmlFor="description" className="mb-1 block text-sm font-medium text-gray-700">
+                <label htmlFor="description" className="mb-1 block text-sm font-medium text-[#49382D]">
                   Mô tả
                 </label>
                 <textarea
@@ -136,19 +136,19 @@ export default function CreateConsumablePage() {
                   rows={3}
                   maxLength={1000}
                   placeholder="Mô tả thông tin vật tư..."
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                  className="w-full rounded-lg border border-[#E9DED2] px-3 py-2 text-sm outline-none focus:border-[#FF5A00] focus:ring-2 focus:ring-[#FF5A00]/15"
                 />
               </div>
             </section>
 
             <section className="space-y-4">
-              <h2 className="border-b border-gray-100 pb-3 text-lg font-semibold text-gray-900">
+              <h2 className="border-b border-[#E9DED2] pb-3 text-lg font-semibold text-[#49382D]">
                 Quản lý tồn kho
               </h2>
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <label htmlFor="stockQuantity" className="mb-1 block text-sm font-medium text-gray-700">
+                  <label htmlFor="stockQuantity" className="mb-1 block text-sm font-medium text-[#49382D]">
                     Số lượng tồn kho *
                   </label>
                   <input
@@ -159,12 +159,12 @@ export default function CreateConsumablePage() {
                     required
                     value={stockQuantity}
                     onChange={(event) => setStockQuantity(event.target.value)}
-                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                    className="w-full rounded-lg border border-[#E9DED2] px-3 py-2 text-sm outline-none focus:border-[#FF5A00] focus:ring-2 focus:ring-[#FF5A00]/15"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="reorderLevel" className="mb-1 block text-sm font-medium text-gray-700">
+                  <label htmlFor="reorderLevel" className="mb-1 block text-sm font-medium text-[#49382D]">
                     Ngưỡng cần nhập thêm *
                   </label>
                   <input
@@ -175,9 +175,9 @@ export default function CreateConsumablePage() {
                     required
                     value={reorderLevel}
                     onChange={(event) => setReorderLevel(event.target.value)}
-                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                    className="w-full rounded-lg border border-[#E9DED2] px-3 py-2 text-sm outline-none focus:border-[#FF5A00] focus:ring-2 focus:ring-[#FF5A00]/15"
                   />
-                  <p className="mt-1 text-xs text-gray-500">
+                  <p className="mt-1 text-xs text-[#806F62]">
                     Cảnh báo khi số lượng tồn kho bằng hoặc thấp hơn ngưỡng này.
                   </p>
                 </div>
@@ -185,13 +185,13 @@ export default function CreateConsumablePage() {
             </section>
 
             <section className="space-y-4">
-              <h2 className="border-b border-gray-100 pb-3 text-lg font-semibold text-gray-900">
+              <h2 className="border-b border-[#E9DED2] pb-3 text-lg font-semibold text-[#49382D]">
                 Giá và hạn sử dụng
               </h2>
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <label htmlFor="unitPrice" className="mb-1 block text-sm font-medium text-gray-700">
+                  <label htmlFor="unitPrice" className="mb-1 block text-sm font-medium text-[#49382D]">
                     Đơn giá (VNĐ) *
                   </label>
                   <input
@@ -203,12 +203,12 @@ export default function CreateConsumablePage() {
                     value={unitPrice}
                     onChange={(event) => setUnitPrice(event.target.value)}
                     placeholder="Ví dụ: 180000"
-                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                    className="w-full rounded-lg border border-[#E9DED2] px-3 py-2 text-sm outline-none focus:border-[#FF5A00] focus:ring-2 focus:ring-[#FF5A00]/15"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="unit" className="mb-1 block text-sm font-medium text-gray-700">
+                  <label htmlFor="unit" className="mb-1 block text-sm font-medium text-[#49382D]">
                     Đơn vị tính *
                   </label>
                   <input
@@ -218,12 +218,12 @@ export default function CreateConsumablePage() {
                     maxLength={50}
                     required
                     placeholder="Cuộn, hộp, chiếc..."
-                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                    className="w-full rounded-lg border border-[#E9DED2] px-3 py-2 text-sm outline-none focus:border-[#FF5A00] focus:ring-2 focus:ring-[#FF5A00]/15"
                   />
                 </div>
 
                 <div className="sm:col-span-2">
-                  <label htmlFor="expiryDate" className="mb-1 block text-sm font-medium text-gray-700">
+                  <label htmlFor="expiryDate" className="mb-1 block text-sm font-medium text-[#49382D]">
                     Ngày hết hạn
                   </label>
                   <input
@@ -231,7 +231,7 @@ export default function CreateConsumablePage() {
                     type="date"
                     value={expiryDate}
                     onChange={(event) => setExpiryDate(event.target.value)}
-                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                    className="w-full rounded-lg border border-[#E9DED2] px-3 py-2 text-sm outline-none focus:border-[#FF5A00] focus:ring-2 focus:ring-[#FF5A00]/15"
                   />
                 </div>
               </div>
@@ -246,7 +246,7 @@ export default function CreateConsumablePage() {
               </div>
             )}
 
-            <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 text-sm text-blue-800">
+            <div className="rounded-lg border border-[#E9DED2] bg-[#FFF9F2] p-4 text-sm text-[#806F62]">
               <p className="font-semibold">Chế độ lưu dữ liệu kiểm thử</p>
               <p className="mt-1">
                 Dữ liệu được lưu trên trình duyệt bằng localStorage.
@@ -257,7 +257,7 @@ export default function CreateConsumablePage() {
             <div className="flex flex-col-reverse justify-end gap-3 sm:flex-row">
               <Link
                 href="/dashboard/provider/consumables"
-                className="rounded-lg border border-gray-300 px-5 py-2.5 text-center text-sm font-medium text-gray-700 hover:bg-gray-50"
+                className="rounded-lg border border-[#E9DED2] px-5 py-2.5 text-center text-sm font-medium text-[#49382D] hover:bg-[#FFF9F2]"
               >
                 Hủy
               </Link>
@@ -265,7 +265,7 @@ export default function CreateConsumablePage() {
               <button
                 type="submit"
                 disabled={saving}
-                className="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+                className="rounded-lg bg-[#FF5A00] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#E94F00] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {saving ? "Đang lưu..." : "Thêm vật tư"}
               </button>
