@@ -6,6 +6,7 @@ import com.lentd6190art.fpp.resource.exception.ResourceNotFoundException;
 import com.lentd6190art.fpp.resource.model.CreativeSpace;
 import com.lentd6190art.fpp.resource.model.enums.AvailabilityStatus;
 import com.lentd6190art.fpp.resource.repository.CreativeSpaceRepository;
+import com.lentd6190art.fpp.resource.config.ProviderAuthenticationDetails;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.access.AccessDeniedException;
 
 import java.util.UUID;
 
@@ -95,16 +97,21 @@ public class CreativeSpaceService {
     }
 
     private UUID getProviderId(Authentication authentication) {
-        if (authentication == null || authentication.getPrincipal() == null) {
-            throw new IllegalArgumentException("Authentication is required");
+        if (authentication == null) {
+            throw new AccessDeniedException(
+                    "Authenticated provider access is required");
         }
 
-        try {
-            return UUID.fromString(authentication.getPrincipal().toString());
-        } catch (IllegalArgumentException exception) {
-            throw new IllegalArgumentException("Invalid provider identity");
+        if (!(authentication.getDetails()
+                instanceof ProviderAuthenticationDetails details)
+                || details.providerId() == null) {
+            throw new AccessDeniedException(
+                    "Approved provider identity is required");
         }
+
+        return details.providerId();
     }
+
 
     private CreativeSpace findOwnedCreativeSpace(UUID id, UUID providerId) {
         return creativeSpaceRepository

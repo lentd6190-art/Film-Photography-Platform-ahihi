@@ -2,6 +2,7 @@
 package com.lentd6190art.fpp.identity.service;
 
 import java.util.List;
+import java.util.UUID;
 
 import com.lentd6190art.fpp.identity.dto.LoginRequest;
 import com.lentd6190art.fpp.identity.dto.LoginResponse;
@@ -22,19 +23,23 @@ public class AuthService {
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
     private final RoleRepository roleRepository;
+    private final ProviderIdentityService providerIdentityService;
         public AuthService(
                 UserRepository userRepository,
                 RoleRepository roleRepository,
                 PasswordEncoder passwordEncoder,
                 JwtService jwtService,
-                RefreshTokenService refreshTokenService
+                RefreshTokenService refreshTokenService,
+                ProviderIdentityService providerIdentityService
         ) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.refreshTokenService = refreshTokenService;
+        this.providerIdentityService = providerIdentityService;
         }
+
         @Transactional
         public void register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.email())) {
@@ -82,10 +87,13 @@ public class AuthService {
                 .map(Role::getName)
                 .toList();
 
+        UUID providerId = providerIdentityService.resolveProviderId(user);
+
         String accessToken = jwtService.generateAccessToken(
                 user.getId(),
                 user.getEmail(),
-                roles
+                roles,
+                providerId
         );
         String refreshToken = refreshTokenService.create(user);
 

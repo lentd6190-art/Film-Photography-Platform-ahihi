@@ -28,18 +28,37 @@ public class JwtService {
         this.accessTokenExpiration = accessTokenExpiration;
     }
 
-    public String generateAccessToken(UUID userId, String email, List<String> roles) {
+    public String generateAccessToken(
+        UUID userId,
+        String email,
+        List<String> roles
+    ) {
+        return generateAccessToken(userId, email, roles, null);
+    }
+
+    public String generateAccessToken(
+            UUID userId,
+            String email,
+            List<String> roles,
+            UUID providerId
+    ) {
         Date now = new Date();
         Date expiration = new Date(
                 now.getTime() + accessTokenExpiration
         );
 
-        return Jwts.builder()
+        var builder = Jwts.builder()
                 .subject(userId.toString())
                 .claim("email", email)
                 .claim("roles", roles)
                 .issuedAt(now)
-                .expiration(expiration)
+                .expiration(expiration);
+
+        if (providerId != null) {
+            builder.claim("providerId", providerId.toString());
+        }
+
+        return builder
                 .signWith(secretKey)
                 .compact();
     }
