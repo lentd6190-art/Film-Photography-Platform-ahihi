@@ -28,8 +28,8 @@ function isAuthEndpoint(url?: string): boolean {
   if (!url) return false;
 
   return (
-    url.includes("/api/v1/auth/login") ||
-    url.includes("/api/v1/auth/refresh-token")
+    url.includes("/v1/auth/login") ||
+    url.includes("/v1/auth/refresh-token")
   );
 }
 
