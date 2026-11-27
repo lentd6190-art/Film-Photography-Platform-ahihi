@@ -5,6 +5,7 @@ import '../features/auth/screens/forgot_password_screen.dart';
 import '../features/auth/screens/login_screen.dart';
 import '../features/auth/screens/register_screen.dart';
 import '../features/auth/screens/splash_screen.dart';
+import '../features/discovery/screens/discovery_screen.dart';
 
 class FilmPhotographyApp extends StatelessWidget {
   const FilmPhotographyApp({super.key});
@@ -27,6 +28,7 @@ class FilmPhotographyApp extends StatelessWidget {
         '/login': (context) => const LoginScreen(),
         '/register': (context) => const RegisterScreen(),
         '/forgot-password': (context) => const ForgotPasswordScreen(),
+        '/discovery': (context) => const DiscoveryScreen(),
       },
     );
   }

@@ -82,6 +82,16 @@ class LoginScreen extends StatelessWidget {
                   child: const Text('Log in'),
                 ),
                 const SizedBox(height: 16),
+
+                OutlinedButton(
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/discovery');
+                  },
+                  child: const Text('Explore as Guest'),
+                ),
+
+                const SizedBox(height: 16),
+                
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
