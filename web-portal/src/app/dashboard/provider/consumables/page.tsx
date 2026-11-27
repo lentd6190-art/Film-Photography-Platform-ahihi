@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
@@ -14,8 +14,8 @@ const STATUS_LABELS: Record<Consumable["status"], string> = {
 };
 
 const STATUS_STYLES: Record<Consumable["status"], string> = {
-  ACTIVE: "bg-green-100 text-green-700",
-  INACTIVE: "bg-gray-100 text-gray-600",
+  ACTIVE: "bg-green-50 text-[#27845B]",
+  INACTIVE: "bg-[#F3EEE8] text-[#806F62]",
 };
 
 const formatPrice = (price: number) =>
@@ -93,57 +93,57 @@ export default function ConsumablesPage() {
         <div className="space-y-6">
           <section className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">
+              <h1 className="text-2xl font-bold text-[#49382D]">
                 Vật tư tiêu hao của tôi
               </h1>
-              <p className="mt-1 text-sm text-gray-500">
+              <p className="mt-1 text-sm text-[#806F62]">
                 Theo dõi số lượng tồn kho, giá và tình trạng vật tư.
               </p>
             </div>
 
             <Link
               href="/dashboard/provider/consumables/create"
-              className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700"
+              className="inline-flex items-center justify-center rounded-xl bg-[#FF5A00] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#E94F00]"
             >
               + Thêm vật tư
             </Link>
           </section>
 
-          <section className="rounded-xl border border-blue-200 bg-blue-50 p-4">
-            <p className="text-sm leading-6 text-blue-800">
+          <section className="rounded-[18px] border border-[#E9DED2] bg-[#FFF9F2] p-4">
+            <p className="text-sm leading-6 text-[#806F62]">
               <strong>Chế độ kiểm thử giao diện:</strong> Dữ liệu đang được
               lưu trên trình duyệt bằng localStorage. Chưa kết nối Resource API.
             </p>
           </section>
 
           <section className="grid gap-4 sm:grid-cols-3">
-            <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-              <p className="text-sm text-gray-500">Tổng vật tư</p>
-              <p className="mt-2 text-3xl font-bold text-gray-900">
+            <div className="rounded-[18px] border border-[#E9DED2] bg-white p-5 shadow-sm">
+              <p className="text-sm text-[#806F62]">Tổng vật tư</p>
+              <p className="mt-2 text-3xl font-bold text-[#49382D]">
                 {loading ? "--" : items.length}
               </p>
             </div>
 
-            <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-              <p className="text-sm text-gray-500">Đang hoạt động</p>
-              <p className="mt-2 text-3xl font-bold text-green-600">
+            <div className="rounded-[18px] border border-[#E9DED2] bg-white p-5 shadow-sm">
+              <p className="text-sm text-[#806F62]">Đang hoạt động</p>
+              <p className="mt-2 text-3xl font-bold text-[#27845B]">
                 {loading ? "--" : activeCount}
               </p>
             </div>
 
-            <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-              <p className="text-sm text-gray-500">Cần nhập thêm</p>
-              <p className="mt-2 text-3xl font-bold text-orange-600">
+            <div className="rounded-[18px] border border-[#E9DED2] bg-white p-5 shadow-sm">
+              <p className="text-sm text-[#806F62]">Cần nhập thêm</p>
+              <p className="mt-2 text-3xl font-bold text-[#D99124]">
                 {loading ? "--" : lowStockCount}
               </p>
             </div>
           </section>
 
-          <section className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+          <section className="rounded-[18px] border border-[#E9DED2] bg-white p-5 shadow-sm">
             <div className="grid gap-4 md:grid-cols-3">
               <div className="md:col-span-1">
                 <label htmlFor="consumable-search"
-                  className="mb-1.5 block text-sm font-medium text-gray-700">
+                  className="mb-1.5 block text-sm font-medium text-[#49382D]">
                   Tìm kiếm vật tư
                 </label>
                 <input
@@ -151,20 +151,20 @@ export default function ConsumablesPage() {
                   value={search}
                   onChange={(event) => setSearch(event.target.value)}
                   placeholder="Tên, mô tả hoặc đơn vị..."
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                  className="w-full rounded-xl border border-[#DCCBBB] px-3 py-2.5 text-sm outline-none focus:border-[#FF5A00] focus:ring-2 focus:ring-[#FF5A00]/15"
                 />
               </div>
 
               <div>
                 <label htmlFor="consumable-status"
-                  className="mb-1.5 block text-sm font-medium text-gray-700">
+                  className="mb-1.5 block text-sm font-medium text-[#49382D]">
                   Trạng thái
                 </label>
                 <select
                   id="consumable-status"
                   value={statusFilter}
                   onChange={(event) => setStatusFilter(event.target.value)}
-                  className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm">
+                  className="w-full rounded-xl border border-[#DCCBBB] bg-white px-3 py-2.5 text-sm">
                   <option value="ALL">Tất cả trạng thái</option>
                   <option value="ACTIVE">Đang hoạt động</option>
                   <option value="INACTIVE">Ngừng hoạt động</option>
@@ -173,14 +173,14 @@ export default function ConsumablesPage() {
 
               <div>
                 <label htmlFor="consumable-stock"
-                  className="mb-1.5 block text-sm font-medium text-gray-700">
+                  className="mb-1.5 block text-sm font-medium text-[#49382D]">
                   Tình trạng tồn kho
                 </label>
                 <select
                   id="consumable-stock"
                   value={stockFilter}
                   onChange={(event) => setStockFilter(event.target.value)}
-                  className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm">
+                  className="w-full rounded-xl border border-[#DCCBBB] bg-white px-3 py-2.5 text-sm">
                   <option value="ALL">Tất cả</option>
                   <option value="LOW">Cần nhập thêm</option>
                   <option value="NORMAL">Tồn kho bình thường</option>
@@ -189,42 +189,42 @@ export default function ConsumablesPage() {
             </div>
           </section>
 
-          <section className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
-            <div className="border-b border-gray-200 p-5">
-              <h2 className="text-lg font-semibold text-gray-900">
+          <section className="overflow-hidden rounded-[18px] border border-[#E9DED2] bg-white shadow-sm">
+            <div className="border-b border-[#E9DED2] p-5">
+              <h2 className="text-lg font-semibold text-[#49382D]">
                 Danh sách vật tư
               </h2>
-              <p className="mt-1 text-sm text-gray-500">
+              <p className="mt-1 text-sm text-[#806F62]">
                 {loading ? "Đang tải dữ liệu..." :
                   `${filteredItems.length} vật tư được tìm thấy`}
               </p>
             </div>
 
             {error && (
-              <div className="m-5 rounded-lg bg-red-50 p-4 text-sm text-red-700">
+              <div className="m-5 rounded-xl bg-red-50 p-4 text-sm text-[#D94B43]">
                 {error}
               </div>
             )}
 
             {loading ? (
-              <div className="px-4 py-12 text-center text-sm text-gray-500">
+              <div className="px-4 py-12 text-center text-sm text-[#806F62]">
                 Đang tải danh sách vật tư...
               </div>
             ) : filteredItems.length === 0 ? (
               <div className="px-4 py-12 text-center">
                 <p className="text-4xl" aria-hidden="true">📦</p>
-                <h3 className="mt-3 font-semibold text-gray-800">
+                <h3 className="mt-3 font-semibold text-[#49382D]">
                   {items.length === 0
                     ? "Chưa có vật tư nào"
                     : "Không tìm thấy vật tư phù hợp"}
                 </h3>
-                <p className="mt-2 text-sm text-gray-500">
+                <p className="mt-2 text-sm text-[#806F62]">
                   Thử thay đổi từ khóa hoặc bộ lọc.
                 </p>
                 {items.length === 0 && (
                   <Link
                     href="/dashboard/provider/consumables/create"
-                    className="mt-4 inline-flex rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white">
+                    className="mt-4 inline-flex rounded-xl bg-[#FF5A00] px-4 py-2 text-sm font-medium text-white">
                     + Thêm vật tư
                   </Link>
                 )}
@@ -232,7 +232,7 @@ export default function ConsumablesPage() {
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[850px] text-left text-sm">
-                  <thead className="bg-gray-50 text-xs uppercase text-gray-500">
+                  <thead className="bg-[#FFF9F2] text-xs uppercase text-[#806F62]">
                     <tr>
                       <th className="px-5 py-3 font-semibold">Vật tư</th>
                       <th className="px-5 py-3 font-semibold">Tồn kho</th>
@@ -242,39 +242,39 @@ export default function ConsumablesPage() {
                       <th className="px-5 py-3 font-semibold">Hạn sử dụng</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-100">
+                  <tbody className="divide-y divide-[#E9DED2]">
                     {filteredItems.map((item) => {
                       const lowStock =
                         item.stockQuantity <= item.reorderLevel;
 
                       return (
-                        <tr key={item.id} className="hover:bg-gray-50">
+                        <tr key={item.id} className="hover:bg-[#FFF9F2]">
                           <td className="px-5 py-4">
                             <Link
                               href={`/dashboard/provider/consumables/${item.id}`}
-                              className="font-semibold text-blue-700 hover:underline">
+                              className="font-semibold text-[#FF5A00] hover:underline">
                               {item.name}
                             </Link>
-                            <p className="mt-1 text-xs text-gray-500">
+                            <p className="mt-1 text-xs text-[#806F62]">
                               {item.unit || "Chưa có đơn vị"}
                             </p>
                           </td>
                           <td className="px-5 py-4">
                             <span className={lowStock
-                              ? "font-semibold text-orange-600"
-                              : "font-medium text-gray-900"}>
+                              ? "font-semibold text-[#D99124]"
+                              : "font-medium text-[#49382D]"}>
                               {item.stockQuantity} {item.unit}
                             </span>
                             {lowStock && (
-                              <p className="mt-1 text-xs text-orange-600">
+                              <p className="mt-1 text-xs text-[#D99124]">
                                 Cần nhập thêm
                               </p>
                             )}
                           </td>
-                          <td className="px-5 py-4 text-gray-600">
+                          <td className="px-5 py-4 text-[#806F62]">
                             {item.reorderLevel} {item.unit}
                           </td>
-                          <td className="px-5 py-4 font-medium text-gray-900">
+                          <td className="px-5 py-4 font-medium text-[#49382D]">
                             {formatPrice(item.unitPrice)}
                           </td>
                           <td className="px-5 py-4">
@@ -282,7 +282,7 @@ export default function ConsumablesPage() {
                               {STATUS_LABELS[item.status]}
                             </span>
                           </td>
-                          <td className="px-5 py-4 text-gray-600">
+                          <td className="px-5 py-4 text-[#806F62]">
                             {item.expiryDate || "Không có"}
                           </td>
                         </tr>

@@ -44,9 +44,9 @@ const MAINTENANCE_STATUSES: {
 ];
 
 const inputClass =
-  "w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100";
+  "w-full rounded-xl border border-[#E9DED2] bg-white px-3 py-2.5 text-sm text-[#49382D] outline-none transition-colors focus:border-[#FF5A00] focus:ring-2 focus:ring-[#FFE1CC]";
 
-const labelClass = "mb-1.5 block text-sm font-medium text-gray-700";
+const labelClass = "mb-1.5 block text-sm font-medium text-[#49382D]";
 
 function toFormData(item: Equipment): EquipmentFormData {
   return {
@@ -232,7 +232,7 @@ function EquipmentEditContent() {
     return (
       <DashboardLayout title="Chỉnh sửa thiết bị">
         <div className="flex min-h-[300px] items-center justify-center">
-          <p className="text-sm text-gray-500">Đang tải thông tin thiết bị...</p>
+          <p className="text-sm text-[#806F62]">Đang tải thông tin thiết bị...</p>
         </div>
       </DashboardLayout>
     );
@@ -241,16 +241,16 @@ function EquipmentEditContent() {
   if (!equipment || !form) {
     return (
       <DashboardLayout title="Chỉnh sửa thiết bị">
-        <div className="mx-auto max-w-3xl rounded-xl border border-gray-200 bg-white p-8 text-center">
-          <h1 className="text-xl font-semibold text-gray-900">
+        <div className="mx-auto max-w-3xl rounded-2xl border border-[#E9DED2] bg-white p-8 text-center shadow-sm">
+          <h1 className="text-xl font-semibold text-[#49382D]">
             Không tìm thấy thiết bị
           </h1>
-          <p className="mt-2 text-sm text-gray-500">
+          <p className="mt-2 text-sm text-[#806F62]">
             {error || "Thiết bị không tồn tại hoặc không thể truy cập."}
           </p>
           <Link
             href="/dashboard/provider/equipment"
-            className="mt-6 inline-block rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-medium text-white"
+            className="mt-6 inline-block rounded-xl bg-[#FF5A00] px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#E94F00]"
           >
             Quay lại danh sách
           </Link>
@@ -265,15 +265,15 @@ function EquipmentEditContent() {
         <div>
           <Link
             href={`/dashboard/provider/equipment/${equipment.id}`}
-            className="text-sm font-medium text-blue-600 hover:text-blue-700"
+            className="text-sm font-medium text-[#B94B00] transition-colors hover:text-[#E94F00]"
           >
             ← Quay lại chi tiết thiết bị
           </Link>
 
-          <h1 className="mt-4 text-2xl font-bold text-gray-900">
+          <h1 className="mt-4 text-2xl font-bold text-[#49382D]">
             Chỉnh sửa thiết bị
           </h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-1 text-sm text-[#806F62]">
             Cập nhật thông tin và trạng thái thiết bị.
           </p>
         </div>
@@ -281,7 +281,7 @@ function EquipmentEditContent() {
         {error && (
           <div
             role="alert"
-            className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700"
+            className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-[#D94B43]"
           >
             {error}
           </div>
@@ -289,11 +289,11 @@ function EquipmentEditContent() {
 
         <form
           onSubmit={handleSubmit}
-          className="space-y-6 rounded-xl border border-gray-200 bg-white p-6 shadow-sm"
+          className="space-y-6 rounded-2xl border border-[#E9DED2] bg-white p-6 shadow-sm"
         >
           <fieldset disabled={saving} className="space-y-6">
             <section className="space-y-4">
-              <h2 className="border-b border-gray-100 pb-3 text-lg font-semibold text-gray-900">
+              <h2 className="border-b border-[#E9DED2] pb-3 text-lg font-semibold text-[#49382D]">
                 Thông tin cơ bản
               </h2>
 
@@ -391,7 +391,7 @@ function EquipmentEditContent() {
             </section>
 
             <section className="space-y-4">
-              <h2 className="border-b border-gray-100 pb-3 text-lg font-semibold text-gray-900">
+              <h2 className="border-b border-[#E9DED2] pb-3 text-lg font-semibold text-[#49382D]">
                 Tình trạng và trạng thái
               </h2>
 
@@ -445,7 +445,7 @@ function EquipmentEditContent() {
             </section>
 
             <section className="space-y-4">
-              <h2 className="border-b border-gray-100 pb-3 text-lg font-semibold text-gray-900">
+              <h2 className="border-b border-[#E9DED2] pb-3 text-lg font-semibold text-[#49382D]">
                 Thông tin bảo trì
               </h2>
 
@@ -523,7 +523,7 @@ function EquipmentEditContent() {
             </section>
 
             <section className="space-y-4">
-              <h2 className="border-b border-gray-100 pb-3 text-lg font-semibold text-gray-900">
+              <h2 className="border-b border-[#E9DED2] pb-3 text-lg font-semibold text-[#49382D]">
                 Liên kết và thông tin bổ sung
               </h2>
 
@@ -583,7 +583,7 @@ function EquipmentEditContent() {
             </section>
           </fieldset>
 
-          <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 text-sm text-blue-800">
+          <div className="rounded-xl border border-[#FFD6B8] bg-[#FFF7F0] p-4 text-sm text-[#80502F]">
             <p className="font-semibold">Chế độ dữ liệu kiểm thử</p>
             <p className="mt-1">
               Thay đổi được lưu trên trình duyệt bằng localStorage, chưa gửi
@@ -594,7 +594,7 @@ function EquipmentEditContent() {
           <div className="flex flex-col-reverse justify-end gap-3 sm:flex-row">
             <Link
               href={`/dashboard/provider/equipment/${equipment.id}`}
-              className="rounded-lg border border-gray-300 px-5 py-2.5 text-center text-sm font-medium text-gray-700 hover:bg-gray-50"
+              className="rounded-xl border border-[#DCCBBB] px-5 py-2.5 text-center text-sm font-semibold text-[#806F62] transition-colors hover:bg-[#FFF9F2]"
             >
               Hủy
             </Link>
@@ -602,7 +602,7 @@ function EquipmentEditContent() {
             <button
               type="submit"
               disabled={saving}
-              className="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+              className="rounded-xl bg-[#FF5A00] px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#E94F00] disabled:cursor-not-allowed disabled:opacity-60"
             >
               {saving ? "Đang lưu..." : "Lưu thay đổi"}
             </button>
@@ -619,7 +619,7 @@ export default function EditEquipmentPage() {
       <Suspense
         fallback={
           <DashboardLayout title="Chỉnh sửa thiết bị">
-            <p className="p-6 text-sm text-gray-500">Đang tải trang...</p>
+            <p className="p-6 text-sm text-[#806F62]">Đang tải trang...</p>
           </DashboardLayout>
         }
       >

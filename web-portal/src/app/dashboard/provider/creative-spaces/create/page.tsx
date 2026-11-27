@@ -61,7 +61,7 @@ function PreviewImage({ imageUrl }: { imageUrl: string }) {
   const [imageError, setImageError] = useState(false);
 
   return (
-    <div className="relative aspect-video overflow-hidden rounded-lg bg-gray-100">
+    <div className="relative aspect-video overflow-hidden rounded-lg bg-[#FFF9F2]">
       {!imageError ? (
         <Image
           src={imageUrl}
@@ -73,7 +73,7 @@ function PreviewImage({ imageUrl }: { imageUrl: string }) {
           onError={() => setImageError(true)}
         />
       ) : (
-        <div className="flex h-full flex-col items-center justify-center gap-2 text-gray-400">
+        <div className="flex h-full flex-col items-center justify-center gap-2 text-[#A39487]">
           <span className="text-3xl" aria-hidden="true">
             📷
           </span>
@@ -206,9 +206,9 @@ function CreateCreativeSpaceForm() {
   }
 
   const inputClass =
-    "mt-1 w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100";
+    "mt-1 w-full rounded-lg border border-[#E9DED2] px-3 py-2.5 text-sm text-[#49382D] outline-none focus:border-[#FF5A00] focus:ring-2 focus:ring-[#FF5A00]/15";
 
-  const labelClass = "block text-sm font-medium text-gray-700";
+  const labelClass = "block text-sm font-medium text-[#49382D]";
 
   return (
     <DashboardLayout title="Tạo Creative Space">
@@ -217,16 +217,16 @@ function CreateCreativeSpaceForm() {
         <div>
           <Link
             href="/dashboard/provider/creative-spaces"
-            className="text-sm font-medium text-blue-600 hover:underline"
+            className="text-sm font-medium text-[#FF5A00] hover:underline"
           >
             ← Quay lại danh sách
           </Link>
 
-          <h2 className="mt-4 text-2xl font-bold text-gray-900">
+          <h2 className="mt-4 text-2xl font-bold text-[#49382D]">
             Tạo Creative Space mới
           </h2>
 
-          <p className="mt-2 text-sm text-gray-500">
+          <p className="mt-2 text-sm text-[#806F62]">
             Điền thông tin để đăng ký Darkroom hoặc Studio của bạn.
           </p>
         </div>
@@ -247,7 +247,7 @@ function CreateCreativeSpaceForm() {
         >
           {/* Thông tin cơ bản */}
           <section className="space-y-4">
-            <h3 className="border-b pb-3 text-lg font-semibold text-gray-900">
+            <h3 className="border-b pb-3 text-lg font-semibold text-[#49382D]">
               Thông tin cơ bản
             </h3>
 
@@ -360,7 +360,7 @@ function CreateCreativeSpaceForm() {
 
           {/* Đặc điểm không gian */}
           <section className="space-y-4">
-            <h3 className="border-b pb-3 text-lg font-semibold text-gray-900">
+            <h3 className="border-b pb-3 text-lg font-semibold text-[#49382D]">
               Đặc điểm không gian
             </h3>
 
@@ -440,7 +440,7 @@ function CreateCreativeSpaceForm() {
                 placeholder="Ví dụ: Backdrop, Darkroom equipment"
                 maxLength={1000}
               />
-              <p className="mt-1 text-xs text-gray-500">
+              <p className="mt-1 text-xs text-[#806F62]">
                 Phân cách các mục bằng dấu phẩy.
               </p>
             </div>
@@ -457,7 +457,7 @@ function CreateCreativeSpaceForm() {
                 placeholder="Ví dụ: Wi-Fi, Parking, Air conditioning"
                 maxLength={1000}
               />
-              <p className="mt-1 text-xs text-gray-500">
+              <p className="mt-1 text-xs text-[#806F62]">
                 Phân cách các tiện ích bằng dấu phẩy.
               </p>
             </div>
@@ -465,7 +465,7 @@ function CreateCreativeSpaceForm() {
 
           {/* Giá thuê và quy định */}
           <section className="space-y-4">
-            <h3 className="border-b pb-3 text-lg font-semibold text-gray-900">
+            <h3 className="border-b pb-3 text-lg font-semibold text-[#49382D]">
               Giá thuê và quy định
             </h3>
 
@@ -543,7 +543,7 @@ function CreateCreativeSpaceForm() {
 
           {/* Hình ảnh và xem trước */}
           <section className="space-y-4">
-            <h3 className="border-b pb-3 text-lg font-semibold text-gray-900">
+            <h3 className="border-b pb-3 text-lg font-semibold text-[#49382D]">
               Hình ảnh Creative Space
             </h3>
 
@@ -563,7 +563,7 @@ function CreateCreativeSpaceForm() {
                 maxLength={3000}
               />
 
-              <p className="mt-2 text-xs text-gray-500">
+              <p className="mt-2 text-xs text-[#806F62]">
                 Nhập URL ảnh và phân cách bằng dấu phẩy. Chỉ chấp nhận URL
                 bắt đầu bằng http:// hoặc https://. Hiện tại chưa hỗ trợ tải
                 ảnh trực tiếp từ máy tính.
@@ -589,10 +589,10 @@ function CreateCreativeSpaceForm() {
             {validImageUrls.length > 0 && (
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <h4 className="text-sm font-semibold text-gray-800">
+                  <h4 className="text-sm font-semibold text-[#49382D]">
                     Xem trước hình ảnh
                   </h4>
-                  <span className="text-xs text-gray-500">
+                  <span className="text-xs text-[#806F62]">
                     {validImageUrls.length} ảnh hợp lệ
                   </span>
                 </div>
@@ -601,7 +601,7 @@ function CreateCreativeSpaceForm() {
                   {validImageUrls.map((url, index) => (
                     <div key={`${url}-${index}`} className="space-y-2">
                       <PreviewImage imageUrl={url} />
-                      <p className="truncate text-xs text-gray-500">
+                      <p className="truncate text-xs text-[#806F62]">
                         Hình ảnh {index + 1}: {url}
                       </p>
                     </div>
@@ -615,7 +615,7 @@ function CreateCreativeSpaceForm() {
           <div className="flex flex-col-reverse gap-3 border-t pt-6 sm:flex-row sm:justify-end">
             <Link
               href="/dashboard/provider/creative-spaces"
-              className="rounded-lg border border-gray-300 px-5 py-2.5 text-center text-sm font-semibold text-gray-700 hover:bg-gray-50"
+              className="rounded-lg border border-[#E9DED2] px-5 py-2.5 text-center text-sm font-semibold text-[#49382D] hover:bg-[#FFF9F2]"
             >
               Hủy
             </Link>
@@ -623,7 +623,7 @@ function CreateCreativeSpaceForm() {
             <button
               type="submit"
               disabled={isSubmitting || invalidImageUrls.length > 0}
-              className="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+              className="rounded-lg bg-[#FF5A00] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#E94F00] disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isSubmitting ? "Đang tạo..." : "Tạo Creative Space"}
             </button>

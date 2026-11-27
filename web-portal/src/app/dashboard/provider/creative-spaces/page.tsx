@@ -51,7 +51,7 @@ function CreativeSpaceImage({ space }: { space: CreativeSpace }) {
   )?.trim();
 
   return (
-    <div className="relative h-48 w-full overflow-hidden bg-gray-100">
+    <div className="relative h-48 w-full overflow-hidden bg-[var(--surface-soft)]">
       {imageUrl && !imageError ? (
         <Image
           src={imageUrl}
@@ -63,7 +63,7 @@ function CreativeSpaceImage({ space }: { space: CreativeSpace }) {
           onError={() => setImageError(true)}
         />
       ) : (
-        <div className="flex h-full flex-col items-center justify-center gap-2 text-gray-400">
+        <div className="flex h-full flex-col items-center justify-center gap-2 text-[var(--text-muted)]">
           <span className="text-4xl" aria-hidden="true">
             📷
           </span>
@@ -215,17 +215,17 @@ export default function CreativeSpacesPage() {
           {/* Tiêu đề */}
           <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">
+              <h1 className="text-2xl font-bold text-[var(--text-primary)]">
                 Creative Spaces của tôi
               </h1>
-              <p className="mt-1 text-sm text-gray-500">
+              <p className="mt-1 text-sm text-[var(--text-muted)]">
                 Quản lý Darkroom và Studio của bạn.
               </p>
             </div>
 
             <Link
               href="/dashboard/provider/creative-spaces/create"
-              className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-blue-700"
+              className="inline-flex items-center justify-center rounded-xl bg-[var(--primary)] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[var(--primary-hover)]"
             >
               + Tạo Creative Space
             </Link>
@@ -234,25 +234,25 @@ export default function CreativeSpacesPage() {
           {/* Thống kê */}
           {!loading && !error && (
             <div className="grid gap-4 sm:grid-cols-3">
-              <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-                <p className="text-sm text-gray-500">
+              <div className="rounded-[18px] fpp-card p-5">
+                <p className="text-sm text-[var(--text-muted)]">
                   Tổng Creative Spaces
                 </p>
-                <p className="mt-2 text-3xl font-bold text-gray-900">
+                <p className="mt-2 text-3xl font-bold text-[var(--text-primary)]">
                   {statistics.total}
                 </p>
               </div>
 
-              <div className="rounded-xl border border-green-200 bg-white p-5 shadow-sm">
-                <p className="text-sm text-gray-500">Đang hoạt động</p>
-                <p className="mt-2 text-3xl font-bold text-green-600">
+              <div className="rounded-[18px] border border-[#B9DEC9] bg-white p-5 shadow-sm">
+                <p className="text-sm text-[var(--text-muted)]">Đang hoạt động</p>
+                <p className="mt-2 text-3xl font-bold text-[var(--success)]">
                   {statistics.active}
                 </p>
               </div>
 
-              <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-                <p className="text-sm text-gray-500">Ngừng hoạt động</p>
-                <p className="mt-2 text-3xl font-bold text-gray-600">
+              <div className="rounded-[18px] fpp-card p-5">
+                <p className="text-sm text-[var(--text-muted)]">Ngừng hoạt động</p>
+                <p className="mt-2 text-3xl font-bold text-[var(--text-secondary)]">
                   {statistics.inactive}
                 </p>
               </div>
@@ -261,8 +261,8 @@ export default function CreativeSpacesPage() {
 
           {/* Tìm kiếm, lọc và sắp xếp */}
           {!loading && !error && spaces.length > 0 && (
-            <section className="space-y-4 rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-              <h2 className="font-semibold text-gray-900">
+            <section className="space-y-4 rounded-[18px] fpp-card p-5">
+              <h2 className="font-semibold text-[var(--text-primary)]">
                 Tìm kiếm và lọc Creative Spaces
               </h2>
 
@@ -270,7 +270,7 @@ export default function CreativeSpacesPage() {
                 <div>
                   <label
                     htmlFor="space-search"
-                    className="mb-2 block text-sm font-medium text-gray-700"
+                    className="mb-2 block text-sm font-medium text-[var(--text-secondary)]"
                   >
                     Tìm theo tên hoặc địa điểm
                   </label>
@@ -280,14 +280,14 @@ export default function CreativeSpacesPage() {
                     value={searchTerm}
                     onChange={(event) => setSearchTerm(event.target.value)}
                     placeholder="Nhập từ khóa..."
-                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                    className="w-full rounded-xl border border-[var(--border-strong)] px-3 py-2 text-sm outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[#FFF0E5]"
                   />
                 </div>
 
                 <div>
                   <label
                     htmlFor="type-filter"
-                    className="mb-2 block text-sm font-medium text-gray-700"
+                    className="mb-2 block text-sm font-medium text-[var(--text-secondary)]"
                   >
                     Loại không gian
                   </label>
@@ -297,7 +297,7 @@ export default function CreativeSpacesPage() {
                     onChange={(event) =>
                       setTypeFilter(event.target.value as TypeFilter)
                     }
-                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500"
+                    className="w-full rounded-xl border border-[var(--border-strong)] px-3 py-2 text-sm outline-none focus:border-[var(--primary)]"
                   >
                     <option value="ALL">Tất cả loại</option>
                     <option value="DARKROOM">Darkroom</option>
@@ -308,7 +308,7 @@ export default function CreativeSpacesPage() {
                 <div>
                   <label
                     htmlFor="status-filter"
-                    className="mb-2 block text-sm font-medium text-gray-700"
+                    className="mb-2 block text-sm font-medium text-[var(--text-secondary)]"
                   >
                     Trạng thái
                   </label>
@@ -318,7 +318,7 @@ export default function CreativeSpacesPage() {
                     onChange={(event) =>
                       setStatusFilter(event.target.value as StatusFilter)
                     }
-                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500"
+                    className="w-full rounded-xl border border-[var(--border-strong)] px-3 py-2 text-sm outline-none focus:border-[var(--primary)]"
                   >
                     <option value="ALL">Tất cả trạng thái</option>
                     <option value="ACTIVE">Đang hoạt động</option>
@@ -329,7 +329,7 @@ export default function CreativeSpacesPage() {
                 <div>
                   <label
                     htmlFor="sort-filter"
-                    className="mb-2 block text-sm font-medium text-gray-700"
+                    className="mb-2 block text-sm font-medium text-[var(--text-secondary)]"
                   >
                     Sắp xếp theo
                   </label>
@@ -339,7 +339,7 @@ export default function CreativeSpacesPage() {
                     onChange={(event) =>
                       setSortOption(event.target.value as SortOption)
                     }
-                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500"
+                    className="w-full rounded-xl border border-[var(--border-strong)] px-3 py-2 text-sm outline-none focus:border-[var(--primary)]"
                   >
                     {sortOptions.map((option) => (
                       <option key={option.value} value={option.value}>
@@ -350,10 +350,10 @@ export default function CreativeSpacesPage() {
                 </div>
               </div>
 
-              <div className="flex flex-wrap items-center justify-between gap-3 border-t border-gray-100 pt-4">
-                <p className="text-sm text-gray-500">
+              <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[var(--border)] pt-4">
+                <p className="text-sm text-[var(--text-muted)]">
                   Tìm thấy{" "}
-                  <strong className="text-gray-900">
+                  <strong className="text-[var(--text-primary)]">
                     {filteredSpaces.length}
                   </strong>{" "}
                   / {spaces.length} không gian
@@ -363,7 +363,7 @@ export default function CreativeSpacesPage() {
                   type="button"
                   onClick={resetFilters}
                   disabled={!hasActiveFilters}
-                  className="text-sm font-medium text-blue-600 hover:underline disabled:cursor-not-allowed disabled:text-gray-400 disabled:no-underline"
+                  className="text-sm font-medium text-[var(--primary)] hover:underline disabled:cursor-not-allowed disabled:text-[var(--text-muted)] disabled:no-underline"
                 >
                   Xóa bộ lọc
                 </button>
@@ -373,9 +373,9 @@ export default function CreativeSpacesPage() {
 
           {/* Loading */}
           {loading && (
-            <div className="rounded-xl border border-gray-200 bg-white py-12 text-center">
-              <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-blue-600" />
-              <p className="mt-4 text-sm text-gray-500">
+            <div className="rounded-[18px] border border-[var(--border)] bg-white py-12 text-center">
+              <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-[var(--border)] border-t-blue-600" />
+              <p className="mt-4 text-sm text-[var(--text-muted)]">
                 Đang tải danh sách Creative Spaces...
               </p>
             </div>
@@ -385,13 +385,13 @@ export default function CreativeSpacesPage() {
           {!loading && error && (
             <div
               role="alert"
-              className="rounded-xl border border-red-200 bg-red-50 p-5 text-red-700"
+              className="rounded-[18px] border border-[#F0C5C1] bg-[#FFF0EE] p-5 text-[var(--danger)]"
             >
               <p className="font-medium">{error}</p>
               <button
                 type="button"
                 onClick={() => void loadSpaces()}
-                className="mt-3 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700"
+                className="mt-3 rounded-xl bg-[var(--danger)] px-4 py-2 text-sm font-medium text-white hover:bg-[#BD3933]"
               >
                 Thử tải lại
               </button>
@@ -400,19 +400,19 @@ export default function CreativeSpacesPage() {
 
           {/* Chưa có dữ liệu */}
           {!loading && !error && spaces.length === 0 && (
-            <div className="rounded-xl border border-dashed border-gray-300 bg-white p-10 text-center">
+            <div className="rounded-[18px] border border-dashed border-[var(--border-strong)] bg-white p-10 text-center">
               <div className="text-5xl" aria-hidden="true">
                 📷
               </div>
-              <h2 className="mt-4 text-lg font-semibold text-gray-900">
+              <h2 className="mt-4 text-lg font-semibold text-[var(--text-primary)]">
                 Bạn chưa có Creative Space nào
               </h2>
-              <p className="mt-2 text-sm text-gray-500">
+              <p className="mt-2 text-sm text-[var(--text-muted)]">
                 Hãy tạo Darkroom hoặc Studio đầu tiên của bạn.
               </p>
               <Link
                 href="/dashboard/provider/creative-spaces/create"
-                className="mt-5 inline-flex rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700"
+                className="mt-5 inline-flex rounded-xl bg-[var(--primary)] px-4 py-2.5 text-sm font-medium text-white hover:bg-[var(--primary-hover)]"
               >
                 + Tạo Creative Space
               </Link>
@@ -424,17 +424,17 @@ export default function CreativeSpacesPage() {
             !error &&
             spaces.length > 0 &&
             filteredSpaces.length === 0 && (
-              <div className="rounded-xl border border-dashed border-gray-300 bg-white p-10 text-center">
-                <h2 className="text-lg font-semibold text-gray-900">
+              <div className="rounded-[18px] border border-dashed border-[var(--border-strong)] bg-white p-10 text-center">
+                <h2 className="text-lg font-semibold text-[var(--text-primary)]">
                   Không tìm thấy Creative Space phù hợp
                 </h2>
-                <p className="mt-2 text-sm text-gray-500">
+                <p className="mt-2 text-sm text-[var(--text-muted)]">
                   Hãy thử thay đổi từ khóa hoặc điều kiện lọc.
                 </p>
                 <button
                   type="button"
                   onClick={resetFilters}
-                  className="mt-4 font-medium text-blue-600 hover:underline"
+                  className="mt-4 font-medium text-[var(--primary)] hover:underline"
                 >
                   Xóa bộ lọc
                 </button>
@@ -447,36 +447,36 @@ export default function CreativeSpacesPage() {
               {filteredSpaces.map((space) => (
                 <article
                   key={space.id}
-                  className="flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition hover:shadow-md"
+                  className="flex flex-col overflow-hidden rounded-[18px] fpp-card transition hover:shadow-md"
                 >
                   <CreativeSpaceImage space={space} />
 
                   <div className="flex flex-1 flex-col p-5">
                     <div className="flex items-start justify-between gap-3">
-                      <span className="rounded-md bg-blue-50 px-3 py-1 text-sm font-medium text-blue-700">
+                      <span className="rounded-md bg-[#FFF0E5] px-3 py-1 text-sm font-medium text-[var(--primary)]">
                         {getTypeLabel(space.type)}
                       </span>
 
                       <span
                         className={`rounded-full px-3 py-1 text-xs font-medium ${
                           space.status === "ACTIVE"
-                            ? "bg-green-100 text-green-700"
-                            : "bg-gray-100 text-gray-600"
+                            ? "bg-[#E8F4EC] text-[var(--success)]"
+                            : "bg-[var(--surface-soft)] text-[var(--text-secondary)]"
                         }`}
                       >
                         {getStatusLabel(space.status)}
                       </span>
                     </div>
 
-                    <h2 className="mt-4 text-lg font-bold text-gray-900">
+                    <h2 className="mt-4 text-lg font-bold text-[var(--text-primary)]">
                       {space.name}
                     </h2>
 
-                    <p className="mt-2 line-clamp-2 min-h-10 text-sm text-gray-600">
+                    <p className="mt-2 line-clamp-2 min-h-10 text-sm text-[var(--text-secondary)]">
                       {space.description}
                     </p>
 
-                    <div className="mt-4 flex-1 space-y-2 text-sm text-gray-600">
+                    <div className="mt-4 flex-1 space-y-2 text-sm text-[var(--text-secondary)]">
                       <p>
                         <strong>Sức chứa:</strong> {space.capacity} người
                       </p>
@@ -493,7 +493,7 @@ export default function CreativeSpacesPage() {
 
                     <Link
                       href={`/dashboard/provider/creative-spaces/${space.id}`}
-                      className="mt-5 inline-flex items-center font-semibold text-blue-600 hover:underline"
+                      className="mt-5 inline-flex items-center font-semibold text-[var(--primary)] hover:underline"
                     >
                       Xem chi tiết →
                     </Link>

@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -43,9 +43,9 @@ const MAINTENANCE_STATUSES: {
 ];
 
 const inputClass =
-  "w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100";
+  "w-full rounded-lg border border-[#E9DED2] px-3 py-2.5 text-sm outline-none focus:border-[#FF5A00] focus:ring-2 focus:ring-[#FF5A00]/15";
 
-const labelClass = "mb-1.5 block text-sm font-medium text-gray-700";
+const labelClass = "mb-1.5 block text-sm font-medium text-[#49382D]";
 
 export default function CreateEquipmentPage() {
   const router = useRouter();
@@ -166,25 +166,25 @@ export default function CreateEquipmentPage() {
           <div>
             <Link
               href="/dashboard/provider/equipment"
-              className="text-sm font-medium text-blue-600 hover:text-blue-700"
+              className="text-sm font-medium text-[#FF5A00] hover:text-[#E94F00]"
             >
               ← Quay lại danh sách thiết bị
             </Link>
 
-            <h1 className="mt-4 text-2xl font-bold text-gray-900">
+            <h1 className="mt-4 text-2xl font-bold text-[#49382D]">
               Thêm thiết bị mới
             </h1>
-            <p className="mt-1 text-sm text-gray-500">
+            <p className="mt-1 text-sm text-[#806F62]">
               Nhập thông tin và thiết lập quản lý thiết bị của nhà cung cấp.
             </p>
           </div>
 
           <form
             onSubmit={handleSubmit}
-            className="space-y-6 rounded-xl border border-gray-200 bg-white p-6 shadow-sm"
+            className="space-y-6 rounded-xl border border-[#E9DED2] bg-white p-6 shadow-sm"
           >
             <section className="space-y-4">
-              <h2 className="border-b border-gray-100 pb-3 text-lg font-semibold text-gray-900">
+              <h2 className="border-b border-[#E9DED2] pb-3 text-lg font-semibold text-[#49382D]">
                 Thông tin cơ bản
               </h2>
 
@@ -253,7 +253,7 @@ export default function CreateEquipmentPage() {
             </section>
 
             <section className="space-y-4">
-              <h2 className="border-b border-gray-100 pb-3 text-lg font-semibold text-gray-900">
+              <h2 className="border-b border-[#E9DED2] pb-3 text-lg font-semibold text-[#49382D]">
                 Thông tin kỹ thuật và trạng thái
               </h2>
 
@@ -329,7 +329,7 @@ export default function CreateEquipmentPage() {
             </section>
 
             <section className="space-y-4">
-              <h2 className="border-b border-gray-100 pb-3 text-lg font-semibold text-gray-900">
+              <h2 className="border-b border-[#E9DED2] pb-3 text-lg font-semibold text-[#49382D]">
                 Thông tin bảo trì
               </h2>
 
@@ -405,7 +405,7 @@ export default function CreateEquipmentPage() {
             </section>
 
             <section className="space-y-4">
-              <h2 className="border-b border-gray-100 pb-3 text-lg font-semibold text-gray-900">
+              <h2 className="border-b border-[#E9DED2] pb-3 text-lg font-semibold text-[#49382D]">
                 Liên kết và thông tin bổ sung
               </h2>
 
@@ -433,7 +433,7 @@ export default function CreateEquipmentPage() {
                     </option>
                   ))}
                 </select>
-                <p className="mt-1 text-xs text-gray-500">
+                <p className="mt-1 text-xs text-[#806F62]">
                   Chỉ hiển thị Creative Space đang hoạt động.
                 </p>
               </div>
@@ -450,7 +450,7 @@ export default function CreateEquipmentPage() {
                   placeholder="Nhập URL hình ảnh, mỗi URL trên một dòng hoặc cách nhau bằng dấu phẩy"
                   className={inputClass}
                 />
-                <p className="mt-1 text-xs text-gray-500">
+                <p className="mt-1 text-xs text-[#806F62]">
                   Hiện lưu danh sách URL để phục vụ cấu trúc dữ liệu frontend.
                 </p>
               </div>
@@ -479,7 +479,7 @@ export default function CreateEquipmentPage() {
               </div>
             )}
 
-            <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 text-sm text-blue-800">
+            <div className="rounded-lg border border-[#E9DED2] bg-[#FFF9F2] p-4 text-sm text-[#806F62]">
               <p className="font-semibold">Chế độ dữ liệu kiểm thử</p>
               <p className="mt-1">
                 Thông tin được lưu trên trình duyệt bằng localStorage. Chức
@@ -490,7 +490,7 @@ export default function CreateEquipmentPage() {
             <div className="flex flex-col-reverse justify-end gap-3 sm:flex-row">
               <Link
                 href="/dashboard/provider/equipment"
-                className="rounded-lg border border-gray-300 px-5 py-2.5 text-center text-sm font-medium text-gray-700 hover:bg-gray-50"
+                className="rounded-lg border border-[#E9DED2] px-5 py-2.5 text-center text-sm font-medium text-[#49382D] hover:bg-[#FFF9F2]"
               >
                 Hủy
               </Link>
@@ -498,7 +498,7 @@ export default function CreateEquipmentPage() {
               <button
                 type="submit"
                 disabled={saving}
-                className="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+                className="rounded-lg bg-[#FF5A00] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#E94F00] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {saving ? "Đang lưu..." : "Lưu thiết bị"}
               </button>

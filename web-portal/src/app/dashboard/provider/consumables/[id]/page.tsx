@@ -25,8 +25,8 @@ function formatDate(value: string) {
 function InfoItem({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <p className="text-sm text-gray-500">{label}</p>
-      <p className="mt-1 whitespace-pre-wrap font-medium text-gray-900">
+      <p className="text-sm text-[#806F62]">{label}</p>
+      <p className="mt-1 whitespace-pre-wrap font-medium text-[#49382D]">
         {value || "Chưa cập nhật"}
       </p>
     </div>
@@ -184,13 +184,13 @@ function ConsumableDetailContent() {
         <div className="mx-auto max-w-5xl space-y-6">
           <Link
             href="/dashboard/provider/consumables"
-            className="text-sm font-medium text-blue-600 hover:text-blue-700"
+            className="text-sm font-medium text-[#B94B00] hover:text-[#E94F00]"
           >
             ← Quay lại danh sách Consumables
           </Link>
 
           {loading ? (
-            <div className="rounded-xl border bg-white p-10 text-center text-gray-500">
+            <div className="rounded-2xl border border-[#E9DED2] bg-white p-10 text-center text-[#806F62]">
               Đang tải thông tin Consumable...
             </div>
           ) : error && !item ? (
@@ -198,33 +198,33 @@ function ConsumableDetailContent() {
               {error}
             </div>
           ) : !item || !form ? (
-            <div className="rounded-xl border bg-white p-10 text-center">
-              <h2 className="font-semibold text-gray-900">
+            <div className="rounded-2xl border border-[#E9DED2] bg-white p-10 text-center">
+              <h2 className="font-semibold text-[#49382D]">
                 Không tìm thấy Consumable
               </h2>
-              <p className="mt-2 text-sm text-gray-500">
+              <p className="mt-2 text-sm text-[#806F62]">
                 Consumable không tồn tại trong dữ liệu kiểm thử.
               </p>
             </div>
           ) : (
             <>
-              <section className="flex flex-col justify-between gap-4 rounded-xl border bg-white p-6 shadow-sm sm:flex-row sm:items-center">
+              <section className="flex flex-col justify-between gap-4 rounded-2xl border border-[#E9DED2] bg-white p-6 shadow-sm sm:flex-row sm:items-center">
                 <div>
                   <div className="flex flex-wrap items-center gap-3">
-                    <h1 className="text-2xl font-bold text-gray-900">
+                    <h1 className="text-2xl font-bold text-[#49382D]">
                       {item.name}
                     </h1>
                     <span
                       className={`rounded-full px-3 py-1 text-xs font-semibold ${
                         item.status === "ACTIVE"
                           ? "bg-green-100 text-green-700"
-                          : "bg-gray-100 text-gray-600"
+                          : "border border-[#E9DED2] bg-[#F8F1E7] text-[#806F62]"
                       }`}
                     >
                       {item.status === "ACTIVE" ? "Đang hoạt động" : "Ngừng hoạt động"}
                     </span>
                   </div>
-                  <p className="mt-2 text-sm text-gray-500">
+                  <p className="mt-2 text-sm text-[#806F62]">
                     {item.stockQuantity <= item.reorderLevel
                       ? "Cảnh báo: Tồn kho thấp"
                       : "Tồn kho bình thường"}
@@ -239,7 +239,7 @@ function ConsumableDetailContent() {
                       setSuccess("");
                       setEditing(true);
                     }}
-                    className="rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700"
+                    className="rounded-xl bg-[#FF5A00] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#E94F00]"
                   >
                     Chỉnh sửa
                   </button>
@@ -247,13 +247,13 @@ function ConsumableDetailContent() {
               </section>
 
               {error && (
-                <div role="alert" className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+                <div role="alert" className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
                   {error}
                 </div>
               )}
 
               {success && (
-                <div role="status" className="rounded-lg border border-green-200 bg-green-50 p-4 text-sm text-green-700">
+                <div role="status" className="rounded-xl border border-green-200 bg-green-50 p-4 text-sm text-green-700">
                   {success}
                 </div>
               )}
@@ -261,15 +261,15 @@ function ConsumableDetailContent() {
               {editing ? (
                 <form
                   onSubmit={handleSubmit}
-                  className="space-y-6 rounded-xl border bg-white p-6 shadow-sm"
+                  className="space-y-6 rounded-2xl border border-[#E9DED2] bg-white p-6 shadow-sm"
                 >
-                  <h2 className="border-b pb-3 text-lg font-semibold text-gray-900">
+                  <h2 className="border-b pb-3 text-lg font-semibold text-[#49382D]">
                     Chỉnh sửa Consumable
                   </h2>
 
                   <div className="grid gap-5 sm:grid-cols-2">
                     <div className="sm:col-span-2">
-                      <label htmlFor="name" className="mb-1 block text-sm font-medium text-gray-700">
+                      <label htmlFor="name" className="mb-1.5 block text-sm font-medium text-[#49382D]">
                         Tên Consumable *
                       </label>
                       <input
@@ -277,12 +277,12 @@ function ConsumableDetailContent() {
                         required
                         value={form.name}
                         onChange={(event) => updateField("name", event.target.value)}
-                        className="w-full rounded-lg border px-3 py-2.5 outline-none focus:border-blue-500"
+                        className="w-full rounded-xl border border-[#E9DED2] bg-white px-3 py-2.5 text-sm text-[#49382D] outline-none transition-colors focus:border-[#FF5A00] focus:ring-2 focus:ring-[#FFE1CC]"
                       />
                     </div>
 
                     <div className="sm:col-span-2">
-                      <label htmlFor="description" className="mb-1 block text-sm font-medium text-gray-700">
+                      <label htmlFor="description" className="mb-1.5 block text-sm font-medium text-[#49382D]">
                         Mô tả
                       </label>
                       <textarea
@@ -290,12 +290,12 @@ function ConsumableDetailContent() {
                         rows={3}
                         value={form.description}
                         onChange={(event) => updateField("description", event.target.value)}
-                        className="w-full rounded-lg border px-3 py-2.5 outline-none focus:border-blue-500"
+                        className="w-full rounded-xl border border-[#E9DED2] bg-white px-3 py-2.5 text-sm text-[#49382D] outline-none transition-colors focus:border-[#FF5A00] focus:ring-2 focus:ring-[#FFE1CC]"
                       />
                     </div>
 
                     <div>
-                      <label htmlFor="stockQuantity" className="mb-1 block text-sm font-medium text-gray-700">
+                      <label htmlFor="stockQuantity" className="mb-1.5 block text-sm font-medium text-[#49382D]">
                         Số lượng tồn kho *
                       </label>
                       <input
@@ -306,12 +306,12 @@ function ConsumableDetailContent() {
                         required
                         value={form.stockQuantity}
                         onChange={(event) => updateField("stockQuantity", Number(event.target.value))}
-                        className="w-full rounded-lg border px-3 py-2.5 outline-none focus:border-blue-500"
+                        className="w-full rounded-xl border border-[#E9DED2] bg-white px-3 py-2.5 text-sm text-[#49382D] outline-none transition-colors focus:border-[#FF5A00] focus:ring-2 focus:ring-[#FFE1CC]"
                       />
                     </div>
 
                     <div>
-                      <label htmlFor="reorderLevel" className="mb-1 block text-sm font-medium text-gray-700">
+                      <label htmlFor="reorderLevel" className="mb-1.5 block text-sm font-medium text-[#49382D]">
                         Ngưỡng tồn kho *
                       </label>
                       <input
@@ -322,12 +322,12 @@ function ConsumableDetailContent() {
                         required
                         value={form.reorderLevel}
                         onChange={(event) => updateField("reorderLevel", Number(event.target.value))}
-                        className="w-full rounded-lg border px-3 py-2.5 outline-none focus:border-blue-500"
+                        className="w-full rounded-xl border border-[#E9DED2] bg-white px-3 py-2.5 text-sm text-[#49382D] outline-none transition-colors focus:border-[#FF5A00] focus:ring-2 focus:ring-[#FFE1CC]"
                       />
                     </div>
 
                     <div>
-                      <label htmlFor="unitPrice" className="mb-1 block text-sm font-medium text-gray-700">
+                      <label htmlFor="unitPrice" className="mb-1.5 block text-sm font-medium text-[#49382D]">
                         Đơn giá (VNĐ) *
                       </label>
                       <input
@@ -338,12 +338,12 @@ function ConsumableDetailContent() {
                         required
                         value={form.unitPrice}
                         onChange={(event) => updateField("unitPrice", Number(event.target.value))}
-                        className="w-full rounded-lg border px-3 py-2.5 outline-none focus:border-blue-500"
+                        className="w-full rounded-xl border border-[#E9DED2] bg-white px-3 py-2.5 text-sm text-[#49382D] outline-none transition-colors focus:border-[#FF5A00] focus:ring-2 focus:ring-[#FFE1CC]"
                       />
                     </div>
 
                     <div>
-                      <label htmlFor="unit" className="mb-1 block text-sm font-medium text-gray-700">
+                      <label htmlFor="unit" className="mb-1.5 block text-sm font-medium text-[#49382D]">
                         Đơn vị tính *
                       </label>
                       <input
@@ -352,12 +352,12 @@ function ConsumableDetailContent() {
                         value={form.unit}
                         onChange={(event) => updateField("unit", event.target.value)}
                         placeholder="Ví dụ: cuộn, hộp, tờ"
-                        className="w-full rounded-lg border px-3 py-2.5 outline-none focus:border-blue-500"
+                        className="w-full rounded-xl border border-[#E9DED2] bg-white px-3 py-2.5 text-sm text-[#49382D] outline-none transition-colors focus:border-[#FF5A00] focus:ring-2 focus:ring-[#FFE1CC]"
                       />
                     </div>
 
                     <div>
-                      <label htmlFor="expiryDate" className="mb-1 block text-sm font-medium text-gray-700">
+                      <label htmlFor="expiryDate" className="mb-1.5 block text-sm font-medium text-[#49382D]">
                         Hạn sử dụng
                       </label>
                       <input
@@ -365,12 +365,12 @@ function ConsumableDetailContent() {
                         type="date"
                         value={form.expiryDate}
                         onChange={(event) => updateField("expiryDate", event.target.value)}
-                        className="w-full rounded-lg border px-3 py-2.5 outline-none focus:border-blue-500"
+                        className="w-full rounded-xl border border-[#E9DED2] bg-white px-3 py-2.5 text-sm text-[#49382D] outline-none transition-colors focus:border-[#FF5A00] focus:ring-2 focus:ring-[#FFE1CC]"
                       />
                     </div>
 
                     <div>
-                      <label htmlFor="status" className="mb-1 block text-sm font-medium text-gray-700">
+                      <label htmlFor="status" className="mb-1.5 block text-sm font-medium text-[#49382D]">
                         Trạng thái
                       </label>
                       <select
@@ -379,7 +379,7 @@ function ConsumableDetailContent() {
                         onChange={(event) =>
                           updateField("status", event.target.value as ConsumableFormData["status"])
                         }
-                        className="w-full rounded-lg border px-3 py-2.5 outline-none focus:border-blue-500"
+                        className="w-full rounded-xl border border-[#E9DED2] bg-white px-3 py-2.5 text-sm text-[#49382D] outline-none transition-colors focus:border-[#FF5A00] focus:ring-2 focus:ring-[#FFE1CC]"
                       >
                         <option value="ACTIVE">Đang hoạt động</option>
                         <option value="INACTIVE">Ngừng hoạt động</option>
@@ -405,14 +405,14 @@ function ConsumableDetailContent() {
                         setError("");
                       }}
                       disabled={saving}
-                      className="rounded-lg border px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+                      className="rounded-xl border border-[#DCCBBB] px-4 py-2.5 text-sm font-medium text-[#806F62] hover:bg-[#FFF9F2] disabled:opacity-50"
                     >
                       Hủy
                     </button>
                     <button
                       type="submit"
                       disabled={saving}
-                      className="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                      className="rounded-xl bg-[#FF5A00] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#E94F00] disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       {saving ? "Đang lưu..." : "Lưu thay đổi"}
                     </button>
@@ -421,28 +421,28 @@ function ConsumableDetailContent() {
               ) : (
                 <>
                   <section className="grid gap-4 sm:grid-cols-3">
-                    <div className="rounded-xl border bg-white p-5 shadow-sm">
-                      <p className="text-sm text-gray-500">Số lượng tồn kho</p>
-                      <p className="mt-2 text-2xl font-bold text-gray-900">
+                    <div className="rounded-2xl border border-[#E9DED2] bg-white p-5 shadow-sm">
+                      <p className="text-sm text-[#806F62]">Số lượng tồn kho</p>
+                      <p className="mt-2 text-2xl font-bold text-[#49382D]">
                         {item.stockQuantity} {item.unit}
                       </p>
                     </div>
-                    <div className="rounded-xl border bg-white p-5 shadow-sm">
-                      <p className="text-sm text-gray-500">Ngưỡng tồn kho</p>
-                      <p className="mt-2 text-2xl font-bold text-gray-900">
+                    <div className="rounded-2xl border border-[#E9DED2] bg-white p-5 shadow-sm">
+                      <p className="text-sm text-[#806F62]">Ngưỡng tồn kho</p>
+                      <p className="mt-2 text-2xl font-bold text-[#49382D]">
                         {item.reorderLevel} {item.unit}
                       </p>
                     </div>
-                    <div className="rounded-xl border bg-white p-5 shadow-sm">
-                      <p className="text-sm text-gray-500">Đơn giá</p>
-                      <p className="mt-2 text-2xl font-bold text-blue-700">
+                    <div className="rounded-2xl border border-[#E9DED2] bg-white p-5 shadow-sm">
+                      <p className="text-sm text-[#806F62]">Đơn giá</p>
+                      <p className="mt-2 text-2xl font-bold text-[#FF5A00]">
                         {formatPrice(item.unitPrice)}
                       </p>
                     </div>
                   </section>
 
-                  <section className="space-y-5 rounded-xl border bg-white p-6 shadow-sm">
-                    <h2 className="border-b pb-3 text-lg font-semibold text-gray-900">
+                  <section className="space-y-5 rounded-2xl border border-[#E9DED2] bg-white p-6 shadow-sm">
+                    <h2 className="border-b pb-3 text-lg font-semibold text-[#49382D]">
                       Thông tin cơ bản
                     </h2>
                     <div className="grid gap-5 sm:grid-cols-2">
@@ -458,8 +458,8 @@ function ConsumableDetailContent() {
                     </div>
                   </section>
 
-                  <section className="rounded-xl border bg-white p-6 shadow-sm">
-                    <h2 className="mb-4 text-lg font-semibold text-gray-900">
+                  <section className="rounded-2xl border border-[#E9DED2] bg-white p-6 shadow-sm">
+                    <h2 className="mb-4 text-lg font-semibold text-[#49382D]">
                       Lịch sử dữ liệu
                     </h2>
                     <div className="grid gap-4 sm:grid-cols-2">
@@ -476,7 +476,7 @@ function ConsumableDetailContent() {
                 </>
               )}
 
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-[#806F62]">
                 Dữ liệu hiện được lưu trên localStorage để kiểm thử giao diện frontend.
               </p>
             </>
@@ -491,7 +491,7 @@ export default function ConsumableDetailPage() {
   return (
     <Suspense
       fallback={
-        <div className="p-10 text-center text-gray-500">
+        <div className="p-10 text-center text-[#806F62]">
           Đang tải thông tin Consumable...
         </div>
       }
