@@ -4,11 +4,11 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public record ConsumableAttributes(
-    Integer stockQuantity,
-    Integer reorderLevel,
-    BigDecimal unitPrice,
-    String unit,
-    LocalDate expiryDate,
-    String status
-) {
+        Integer stockQuantity,
+        Integer reorderLevel,
+        BigDecimal unitPrice,
+        String unit,
+        LocalDate expiryDate,
+        String status,
+        String category) {
 }

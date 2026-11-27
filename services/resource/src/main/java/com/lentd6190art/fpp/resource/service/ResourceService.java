@@ -1,10 +1,13 @@
 
 package com.lentd6190art.fpp.resource.service;
 
+import com.lentd6190art.fpp.resource.config.ProviderAuthenticationDetails;
 import com.lentd6190art.fpp.resource.dto.request.ConsumableAttributes;
 import com.lentd6190art.fpp.resource.dto.request.CreativeSpaceAttributes;
 import com.lentd6190art.fpp.resource.dto.request.EquipmentAttributes;
 import com.lentd6190art.fpp.resource.dto.request.ResourceRequest;
+import com.lentd6190art.fpp.resource.dto.response.PageResponse;
+import com.lentd6190art.fpp.resource.dto.response.PaginationMetadata;
 import com.lentd6190art.fpp.resource.dto.response.ResourceResponse;
 import com.lentd6190art.fpp.resource.exception.ResourceNotFoundException;
 import com.lentd6190art.fpp.resource.model.Consumable;
@@ -14,14 +17,14 @@ import com.lentd6190art.fpp.resource.model.enums.ResourceType;
 import com.lentd6190art.fpp.resource.repository.ConsumableRepository;
 import com.lentd6190art.fpp.resource.repository.CreativeSpaceRepository;
 import com.lentd6190art.fpp.resource.repository.EquipmentRepository;
-import com.lentd6190art.fpp.resource.dto.response.PageResponse;
-import com.lentd6190art.fpp.resource.dto.response.PaginationMetadata;
 
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import tools.jackson.databind.ObjectMapper;
 
@@ -52,17 +55,21 @@ public class ResourceService {
         // ==================== CREATE RESOURCE ====================
 
         @Transactional
-        public ResourceResponse createResource(ResourceRequest request) {
+        public ResourceResponse createResource(
+                        ResourceRequest request,
+                        Authentication authentication) {
                 validateRequest(request);
 
+                UUID providerId = getProviderId(authentication);
+
                 return switch (request.resourceType()) {
-                        case CREATIVE_SPACE -> createCreativeSpace(request);
-                        case EQUIPMENT -> createEquipment(request);
-                        case CONSUMABLE -> createConsumable(request);
+                        case CREATIVE_SPACE -> createCreativeSpace(request, providerId);
+                        case EQUIPMENT -> createEquipment(request, providerId);
+                        case CONSUMABLE -> createConsumable(request, providerId);
                 };
         }
 
-        private ResourceResponse createCreativeSpace(ResourceRequest request) {
+        private ResourceResponse createCreativeSpace(ResourceRequest request, UUID providerId) {
                 CreativeSpaceAttributes attributes = objectMapper.convertValue(
                                 request.attributes(),
                                 CreativeSpaceAttributes.class);
@@ -78,7 +85,7 @@ public class ResourceService {
                 }
 
                 CreativeSpace entity = new CreativeSpace();
-                entity.setProviderId(request.providerId());
+                entity.setProviderId(providerId);
                 entity.setName(request.name());
                 entity.setDescription(request.description());
                 entity.setAddress(attributes.address());
@@ -100,71 +107,147 @@ public class ResourceService {
                 return toResourceResponse(saved);
         }
 
-        private ResourceResponse createEquipment(ResourceRequest request) {
+        private ResourceResponse createEquipment(ResourceRequest request, UUID providerId) {
                 EquipmentAttributes attributes = objectMapper.convertValue(
-                                request.attributes(),
-                                EquipmentAttributes.class);
+                        request.attributes(), EquipmentAttributes.class);
 
+                // Validate category
                 if (attributes.category() == null || attributes.category().isBlank()) {
-                        throw new IllegalArgumentException(
-                                        "Equipment category is required");
+                        throw new IllegalArgumentException("Equipment category is required");
+                }
+                if (attributes.category().length() > 100) {
+                        throw new IllegalArgumentException("Equipment category must not exceed 100 characters");
                 }
 
+                // Validate brand and model
+                if (attributes.brand() != null && attributes.brand().length() > 100) {
+                        throw new IllegalArgumentException("Equipment brand must not exceed 100 characters");
+                }
+                if (attributes.model() != null && attributes.model().length() > 100) {
+                        throw new IllegalArgumentException("Equipment model must not exceed 100 characters");
+                }
+
+                // Apply defaults and validate equipment condition
+                String condition = attributes.equipmentCondition() != null
+                        ? attributes.equipmentCondition() : "GOOD";
+
+                if (!java.util.Set.of(
+                        "NEW", "EXCELLENT", "GOOD", "FAIR", "POOR", "DAMAGED"
+                ).contains(condition)) {
+                        throw new IllegalArgumentException("Invalid equipment condition");
+                }
+
+                // Apply defaults and validate availability status
+                String status = attributes.status() != null
+                        ? attributes.status() : "AVAILABLE";
+
+                if (!java.util.Set.of(
+                        "AVAILABLE", "RENTED", "MAINTENANCE", "INACTIVE"
+                ).contains(status)) {
+                        throw new IllegalArgumentException("Invalid equipment status");
+                }
+
+                // Apply default rental price and reject negative values
+                BigDecimal rentalPrice = attributes.rentalPrice() != null
+                        ? attributes.rentalPrice() : BigDecimal.ZERO;
+
+                if (rentalPrice.compareTo(BigDecimal.ZERO) < 0) {
+                        throw new IllegalArgumentException("Rental price must not be negative");
+                }
+
+                // Build and persist equipment
                 Equipment entity = new Equipment();
-                entity.setProviderId(request.providerId());
+                entity.setProviderId(providerId);
                 entity.setName(request.name());
                 entity.setDescription(request.description());
                 entity.setCategory(attributes.category());
                 entity.setBrand(attributes.brand());
                 entity.setModel(attributes.model());
-                entity.setEquipmentCondition(
-                                attributes.equipmentCondition() != null
-                                                ? attributes.equipmentCondition()
-                                                : "GOOD");
-                entity.setStatus(
-                                attributes.status() != null
-                                                ? attributes.status()
-                                                : "AVAILABLE");
-                entity.setRentalPrice(
-                                attributes.rentalPrice() != null
-                                                ? attributes.rentalPrice()
-                                                : BigDecimal.ZERO);
+                entity.setEquipmentCondition(condition);
+                entity.setStatus(status);
+                entity.setRentalPrice(rentalPrice);
 
                 Equipment saved = equipmentRepository.save(entity);
-
                 return toResourceResponse(saved);
         }
 
-        private ResourceResponse createConsumable(ResourceRequest request) {
-                ConsumableAttributes attributes = objectMapper.convertValue(
-                                request.attributes(),
-                                ConsumableAttributes.class);
+        private ResourceResponse createConsumable(
+                        ResourceRequest request,
+                        UUID providerId) {
 
+                ConsumableAttributes attributes = objectMapper.convertValue(
+                        request.attributes(),
+                        ConsumableAttributes.class);
+
+                // Validate category
+                String category = attributes.category() != null
+                        ? attributes.category().trim()
+                        : null;
+
+                if (category == null || category.isBlank()) {
+                        throw new IllegalArgumentException("Consumable category is required");
+                }
+                if (category.length() > 100) {
+                        throw new IllegalArgumentException(
+                                "Consumable category must not exceed 100 characters");
+                }
+
+                // Apply defaults and validate stock quantity
+                Integer stockQuantity = attributes.stockQuantity() != null
+                        ? attributes.stockQuantity() : 0;
+
+                if (stockQuantity < 0) {
+                        throw new IllegalArgumentException("Stock quantity must not be negative");
+                }
+
+                // Apply defaults and validate reorder level
+                Integer reorderLevel = attributes.reorderLevel() != null
+                        ? attributes.reorderLevel() : 0;
+
+                if (reorderLevel < 0) {
+                        throw new IllegalArgumentException("Reorder level must not be negative");
+                }
+
+                // Apply defaults and validate unit price
+                BigDecimal unitPrice = attributes.unitPrice() != null
+                        ? attributes.unitPrice() : BigDecimal.ZERO;
+
+                if (unitPrice.compareTo(BigDecimal.ZERO) < 0) {
+                        throw new IllegalArgumentException("Unit price must not be negative");
+                }
+
+                // Apply defaults and validate unit
+                String unit = attributes.unit() != null
+                        ? attributes.unit().trim() : "unit";
+
+                if (unit.isBlank()) {
+                        throw new IllegalArgumentException("Consumable unit is required");
+                }
+                if (unit.length() > 50) {
+                        throw new IllegalArgumentException(
+                                "Consumable unit must not exceed 50 characters");
+                }
+
+                // Apply defaults and validate status
+                String status = attributes.status() != null
+                        ? attributes.status() : "ACTIVE";
+
+                if (!java.util.Set.of("ACTIVE", "INACTIVE").contains(status)) {
+                        throw new IllegalArgumentException("Invalid consumable status");
+                }
+
+                // Build and persist consumable
                 Consumable entity = new Consumable();
-                entity.setProviderId(request.providerId());
+                entity.setProviderId(providerId);
                 entity.setName(request.name());
                 entity.setDescription(request.description());
-                entity.setStockQuantity(
-                                attributes.stockQuantity() != null
-                                                ? attributes.stockQuantity()
-                                                : 0);
-                entity.setReorderLevel(
-                                attributes.reorderLevel() != null
-                                                ? attributes.reorderLevel()
-                                                : 0);
-                entity.setUnitPrice(
-                                attributes.unitPrice() != null
-                                                ? attributes.unitPrice()
-                                                : BigDecimal.ZERO);
-                entity.setUnit(
-                                attributes.unit() != null
-                                                ? attributes.unit()
-                                                : "unit");
+                entity.setCategory(category);
+                entity.setStockQuantity(stockQuantity);
+                entity.setReorderLevel(reorderLevel);
+                entity.setUnitPrice(unitPrice);
+                entity.setUnit(unit);
                 entity.setExpiryDate(attributes.expiryDate());
-                entity.setStatus(
-                                attributes.status() != null
-                                                ? attributes.status()
-                                                : "ACTIVE");
+                entity.setStatus(status);
 
                 Consumable saved = consumableRepository.save(entity);
 
@@ -177,7 +260,8 @@ public class ResourceService {
         public ResourceResponse updateResource(
                         ResourceType resourceType,
                         UUID id,
-                        ResourceRequest request) {
+                        ResourceRequest request,
+                        Authentication authentication) {
                 if (resourceType == null) {
                         throw new IllegalArgumentException(
                                         "Resource type is required");
@@ -189,6 +273,7 @@ public class ResourceService {
                 }
 
                 validateRequest(request);
+                UUID providerId = getProviderId(authentication);
 
                 if (request.resourceType() != resourceType) {
                         throw new IllegalArgumentException(
@@ -197,31 +282,27 @@ public class ResourceService {
 
                 return switch (resourceType) {
                         case CREATIVE_SPACE ->
-                                updateCreativeSpace(id, request);
+                                updateCreativeSpace(id, request, providerId);
 
                         case EQUIPMENT ->
-                                updateEquipment(id, request);
+                                updateEquipment(id, request, providerId);
 
                         case CONSUMABLE ->
-                                updateConsumable(id, request);
+                                updateConsumable(id, request, providerId);
                 };
         }
 
         private ResourceResponse updateCreativeSpace(
                         UUID id,
-                        ResourceRequest request) {
-                CreativeSpace entity = creativeSpaceRepository.findById(id)
-                                .orElseThrow(() -> new ResourceNotFoundException(
-                                                "Creative space not found: " + id));
-
-                if (!entity.getProviderId().equals(request.providerId())) {
-                        throw new IllegalArgumentException(
-                                        "Provider ID cannot be changed");
-                }
+                        ResourceRequest request,
+                        UUID providerId) {
+                CreativeSpace entity = creativeSpaceRepository.findByIdAndProviderId(id, providerId)
+                        .orElseThrow(() -> new ResourceNotFoundException(
+                                        "Creative space not found: " + id));
 
                 CreativeSpaceAttributes attributes = objectMapper.convertValue(
                                 request.attributes(),
-                                CreativeSpaceAttributes.class);
+                                 CreativeSpaceAttributes.class);
 
                 if (attributes.address() == null || attributes.address().isBlank()) {
                         throw new IllegalArgumentException(
@@ -282,15 +363,11 @@ public class ResourceService {
 
         private ResourceResponse updateEquipment(
                         UUID id,
-                        ResourceRequest request) {
-                Equipment entity = equipmentRepository.findById(id)
-                                .orElseThrow(() -> new ResourceNotFoundException(
-                                                "Equipment not found: " + id));
-
-                if (!entity.getProviderId().equals(request.providerId())) {
-                        throw new IllegalArgumentException(
-                                        "Provider ID cannot be changed");
-                }
+                        ResourceRequest request,
+                UUID providerId) {
+                Equipment entity = equipmentRepository.findByIdAndProviderId(id, providerId)
+                        .orElseThrow(() -> new ResourceNotFoundException(
+                                        "Equipment not found: " + id));
 
                 EquipmentAttributes attributes = objectMapper.convertValue(
                                 request.attributes(),
@@ -353,8 +430,13 @@ public class ResourceService {
                 entity.setName(request.name());
                 entity.setDescription(request.description());
                 entity.setCategory(attributes.category());
-                entity.setBrand(attributes.brand());
-                entity.setModel(attributes.model());
+                if (attributes.brand() != null) {
+                        entity.setBrand(attributes.brand());
+                }
+
+                if (attributes.model() != null) {
+                        entity.setModel(attributes.model());
+                }
                 entity.setEquipmentCondition(equipmentCondition);
                 entity.setStatus(status);
                 entity.setRentalPrice(rentalPrice);
@@ -366,19 +448,39 @@ public class ResourceService {
 
         private ResourceResponse updateConsumable(
                         UUID id,
-                        ResourceRequest request) {
-                Consumable entity = consumableRepository.findById(id)
-                                .orElseThrow(() -> new ResourceNotFoundException(
-                                                "Consumable not found: " + id));
-
-                if (!entity.getProviderId().equals(request.providerId())) {
-                        throw new IllegalArgumentException(
-                                        "Provider ID cannot be changed");
-                }
+                        ResourceRequest request,
+                        UUID providerId) {
+                Consumable entity = consumableRepository.findByIdAndProviderId(id, providerId)
+                        .orElseThrow(() -> new ResourceNotFoundException(
+                                        "Consumable not found: " + id));
 
                 ConsumableAttributes attributes = objectMapper.convertValue(
                                 request.attributes(),
                                 ConsumableAttributes.class);
+
+                String category = attributes.category() != null
+                        ? attributes.category().trim()
+                        : entity.getCategory();
+
+                if (category == null || category.isBlank()) {
+                        throw new IllegalArgumentException(
+                                "Consumable category is required");
+                }
+
+                String status = attributes.status() != null
+                        ? attributes.status()
+                        : entity.getStatus();
+
+                if (!java.util.Set.of("ACTIVE", "INACTIVE").contains(status)) {
+                        throw new IllegalArgumentException("Invalid consumable status");
+                }
+
+                entity.setStatus(status);
+
+                if (category.length() > 100) {
+                        throw new IllegalArgumentException(
+                                        "Consumable category must not exceed 100 characters");
+                }
 
                 Integer stockQuantity = attributes.stockQuantity() != null
                                 ? attributes.stockQuantity()
@@ -408,8 +510,8 @@ public class ResourceService {
                 }
 
                 String unit = attributes.unit() != null
-                                ? attributes.unit()
-                                : entity.getUnit();
+                        ? attributes.unit().trim()
+                        : entity.getUnit();
 
                 if (unit.isBlank()) {
                         throw new IllegalArgumentException(
@@ -423,15 +525,14 @@ public class ResourceService {
 
                 entity.setName(request.name());
                 entity.setDescription(request.description());
+                entity.setCategory(category);
                 entity.setStockQuantity(stockQuantity);
                 entity.setReorderLevel(reorderLevel);
                 entity.setUnitPrice(unitPrice);
                 entity.setUnit(unit);
-                entity.setExpiryDate(attributes.expiryDate());
-                entity.setStatus(
-                                attributes.status() != null
-                                                ? attributes.status()
-                                                : entity.getStatus());
+                if (attributes.expiryDate() != null) {
+                        entity.setExpiryDate(attributes.expiryDate());
+                }
 
                 Consumable updated = consumableRepository.save(entity);
 
@@ -441,42 +542,12 @@ public class ResourceService {
         // ==================== GET RESOURCE DETAIL ====================
 
         @Transactional(readOnly = true)
-        public ResourceResponse getResource(ResourceType resourceType, UUID id) {
-                if (resourceType == null) {
-                        throw new IllegalArgumentException(
-                                        "Resource type is required");
-                }
-
-                if (id == null) {
-                        throw new IllegalArgumentException(
-                                        "Resource ID is required");
-                }
-
-                return switch (resourceType) {
-                        case CREATIVE_SPACE -> creativeSpaceRepository.findById(id)
-                                        .map(this::toResourceResponse)
-                                        .orElseThrow(() -> new ResourceNotFoundException(
-                                                        "Creative space not found: " + id));
-
-                        case EQUIPMENT -> equipmentRepository.findById(id)
-                                        .map(this::toResourceResponse)
-                                        .orElseThrow(() -> new ResourceNotFoundException(
-                                                        "Equipment not found: " + id));
-
-                        case CONSUMABLE -> consumableRepository.findById(id)
-                                        .map(this::toResourceResponse)
-                                        .orElseThrow(() -> new ResourceNotFoundException(
-                                                        "Consumable not found: " + id));
-                };
-        }
-
-        // ==================== GET RESOURCES WITH PAGINATION ====================
-
-        @Transactional(readOnly = true)
         public PageResponse<ResourceResponse> getResources(
                         ResourceType resourceType,
                         int page,
-                        int size) {
+                        int size,
+                        Authentication authentication) {
+
                 if (resourceType == null) {
                         throw new IllegalArgumentException(
                                         "Resource type is required");
@@ -492,25 +563,32 @@ public class ResourceService {
                                         "Page size must be between 1 and 100");
                 }
 
+                UUID providerId = getProviderId(authentication);
                 Pageable pageable = PageRequest.of(page, size);
 
                 return switch (resourceType) {
                         case CREATIVE_SPACE -> toPageResponse(
-                                        creativeSpaceRepository.findAll(pageable)
+                                        creativeSpaceRepository
+                                                        .findAllByProviderId(providerId, pageable)
                                                         .map(this::toResourceResponse));
 
                         case EQUIPMENT -> toPageResponse(
-                                        equipmentRepository.findAll(pageable)
+                                        equipmentRepository
+                                                        .findAllByProviderId(providerId, pageable)
                                                         .map(this::toResourceResponse));
 
                         case CONSUMABLE -> toPageResponse(
-                                        consumableRepository.findAll(pageable)
+                                        consumableRepository
+                                                        .findAllByProviderId(providerId, pageable)
                                                         .map(this::toResourceResponse));
                 };
         }
 
+        // ==================== PAGINATION RESPONSE MAPPING ====================
+
         private PageResponse<ResourceResponse> toPageResponse(
                         Page<ResourceResponse> resourcePage) {
+
                 PaginationMetadata metadata = new PaginationMetadata(
                                 resourcePage.getNumber(),
                                 resourcePage.getSize(),
@@ -522,6 +600,93 @@ public class ResourceService {
                 return new PageResponse<>(
                                 resourcePage.getContent(),
                                 metadata);
+        }
+
+        // ==================== GET RESOURCE BY ID ====================
+
+        @Transactional(readOnly = true)
+        public ResourceResponse getResource(
+                        ResourceType resourceType,
+                        UUID id,
+                        Authentication authentication) {
+
+                if (resourceType == null) {
+                        throw new IllegalArgumentException(
+                                        "Resource type is required");
+                }
+
+                if (id == null) {
+                        throw new IllegalArgumentException(
+                                        "Resource ID is required");
+                }
+
+                UUID providerId = getProviderId(authentication);
+
+                return switch (resourceType) {
+                        case CREATIVE_SPACE -> toResourceResponse(
+                                        creativeSpaceRepository.findByIdAndProviderId(id, providerId)
+                                                        .orElseThrow(() -> new ResourceNotFoundException(
+                                                                        "Creative space not found: " + id)));
+
+                        case EQUIPMENT -> toResourceResponse(
+                                        equipmentRepository.findByIdAndProviderId(id, providerId)
+                                                        .orElseThrow(() -> new ResourceNotFoundException(
+                                                                        "Equipment not found: " + id)));
+
+                        case CONSUMABLE -> toResourceResponse(
+                                        consumableRepository.findByIdAndProviderId(id, providerId)
+                                                        .orElseThrow(() -> new ResourceNotFoundException(
+                                                                        "Consumable not found: " + id)));
+                };
+        }
+
+        // ==================== DELETE RESOURCE ====================
+        @Transactional
+        public void deleteResource(
+                ResourceType resourceType,
+                UUID id,
+                Authentication authentication) {
+
+                if (resourceType == null) {
+                        throw new IllegalArgumentException(
+                                "Resource type is required");
+                }
+
+                if (id == null) {
+                        throw new IllegalArgumentException(
+                                "Resource ID is required");
+                }
+
+                UUID providerId = getProviderId(authentication);
+
+                switch (resourceType) {
+                        case CREATIVE_SPACE -> {
+                        CreativeSpace entity = creativeSpaceRepository
+                                .findByIdAndProviderId(id, providerId)
+                                .orElseThrow(() -> new ResourceNotFoundException(
+                                        "Creative space not found: " + id));
+
+                        creativeSpaceRepository.delete(entity);
+                        }
+
+                        case EQUIPMENT -> {
+                        Equipment entity = equipmentRepository
+                                .findByIdAndProviderId(id, providerId)
+                                .orElseThrow(() -> new ResourceNotFoundException(
+                                        "Equipment not found: " + id));
+
+                        equipmentRepository.delete(entity);
+                        }
+
+                        case CONSUMABLE -> {
+                        Consumable entity = consumableRepository
+                                .findByIdAndProviderId(id, providerId)
+                                .orElseThrow(() -> new ResourceNotFoundException(
+                                        "Consumable not found: " + id));
+
+                        consumableRepository.delete(entity);
+                        }
+                }
         }
 
         // ==================== ENTITY TO RESPONSE MAPPING ====================
@@ -572,6 +737,7 @@ public class ResourceService {
         private ResourceResponse toResourceResponse(Consumable entity) {
                 Map<String, Object> attributes = new LinkedHashMap<>();
 
+                attributes.put("category", entity.getCategory());
                 attributes.put("stockQuantity", entity.getStockQuantity());
                 attributes.put("reorderLevel", entity.getReorderLevel());
                 attributes.put("unitPrice", entity.getUnitPrice());
@@ -590,32 +756,44 @@ public class ResourceService {
                                 entity.getUpdatedAt().toInstant());
         }
 
+        private UUID getProviderId(Authentication authentication) {
+                if (authentication == null) {
+                        throw new AccessDeniedException(
+                                "Authenticated provider access is required");
+                }
+
+                if (!(authentication.getDetails()
+                        instanceof ProviderAuthenticationDetails details)
+                        || details.providerId() == null) {
+                        throw new AccessDeniedException(
+                                "Approved provider identity is required");
+                }
+
+                return details.providerId();
+        }
+
         // ==================== VALIDATION ====================
 
         private void validateRequest(ResourceRequest request) {
                 if (request == null) {
-                        throw new IllegalArgumentException(
-                                        "Request must not be null");
+                        throw new IllegalArgumentException("Request must not be null");
                 }
 
                 if (request.resourceType() == null) {
-                        throw new IllegalArgumentException(
-                                        "Resource type is required");
-                }
-
-                if (request.providerId() == null) {
-                        throw new IllegalArgumentException(
-                                        "Provider ID is required");
+                        throw new IllegalArgumentException("Resource type is required");
                 }
 
                 if (request.name() == null || request.name().isBlank()) {
+                        throw new IllegalArgumentException("Resource name is required");
+                }
+
+                if (request.name().length() > 200) {
                         throw new IllegalArgumentException(
-                                        "Resource name is required");
+                                "Resource name must not exceed 200 characters");
                 }
 
                 if (request.attributes() == null) {
-                        throw new IllegalArgumentException(
-                                        "Resource attributes are required");
+                        throw new IllegalArgumentException("Resource attributes are required");
                 }
         }
 }

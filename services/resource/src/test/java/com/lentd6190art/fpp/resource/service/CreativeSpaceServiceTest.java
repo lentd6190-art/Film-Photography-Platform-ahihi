@@ -7,6 +7,7 @@ import com.lentd6190art.fpp.resource.model.enums.AvailabilityStatus;
 import com.lentd6190art.fpp.resource.model.enums.CreativeSpaceType;
 import com.lentd6190art.fpp.resource.repository.CreativeSpaceRepository;
 import com.lentd6190art.fpp.resource.exception.ResourceNotFoundException;
+import com.lentd6190art.fpp.resource.config.ProviderAuthenticationDetails;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,7 +17,9 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.AccessDeniedException;
 import org.mockito.ArgumentCaptor;
+
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -49,7 +52,8 @@ class CreativeSpaceServiceTest {
                 UUID providerId = UUID.randomUUID();
 
                 Authentication authentication = mock(Authentication.class);
-                when(authentication.getPrincipal()).thenReturn(providerId.toString());
+                when(authentication.getDetails())
+                                .thenReturn(new ProviderAuthenticationDetails(providerId));
 
                 CreativeSpaceRequest request = new CreativeSpaceRequest(
                                 "My Darkroom",
@@ -102,7 +106,8 @@ class CreativeSpaceServiceTest {
                 UUID creativeSpaceId = UUID.randomUUID();
 
                 Authentication authentication = mock(Authentication.class);
-                when(authentication.getPrincipal()).thenReturn(providerA.toString());
+                when(authentication.getDetails())
+                                .thenReturn(new ProviderAuthenticationDetails(providerA));
 
                 when(creativeSpaceRepository.findByIdAndProviderId(
                                 creativeSpaceId, providerA))
@@ -124,7 +129,8 @@ class CreativeSpaceServiceTest {
                 UUID creativeSpaceId = UUID.randomUUID();
 
                 Authentication authentication = mock(Authentication.class);
-                when(authentication.getPrincipal()).thenReturn(providerId.toString());
+                when(authentication.getDetails())
+                                .thenReturn(new ProviderAuthenticationDetails(providerId));
 
                 when(creativeSpaceRepository.findByIdAndProviderId(
                                 creativeSpaceId, providerId))
@@ -171,7 +177,8 @@ class CreativeSpaceServiceTest {
                 UUID creativeSpaceId = UUID.randomUUID();
 
                 Authentication authentication = mock(Authentication.class);
-                when(authentication.getPrincipal()).thenReturn(providerId.toString());
+                when(authentication.getDetails())
+                                .thenReturn(new ProviderAuthenticationDetails(providerId));
 
                 when(creativeSpaceRepository.findByIdAndProviderId(
                                 creativeSpaceId, providerId))
@@ -193,13 +200,14 @@ class CreativeSpaceServiceTest {
         void create_shouldRejectInvalidProviderIdentity() {
                 // Arrange
                 Authentication authentication = mock(Authentication.class);
-                when(authentication.getPrincipal()).thenReturn("invalid-provider-id");
+                when(authentication.getDetails())
+                        .thenReturn(new ProviderAuthenticationDetails(null));
 
                 CreativeSpaceRequest request = null;
 
                 // Act & Assert
                 assertThrows(
-                                IllegalArgumentException.class,
+                                AccessDeniedException.class,
                                 () -> creativeSpaceService.create(request, authentication));
 
                 verifyNoInteractions(creativeSpaceRepository);
@@ -209,7 +217,7 @@ class CreativeSpaceServiceTest {
         void create_shouldRejectNullAuthentication() {
                 // Act & Assert
                 assertThrows(
-                                IllegalArgumentException.class,
+                                AccessDeniedException.class,
                                 () -> creativeSpaceService.create(null, null));
 
                 verifyNoInteractions(creativeSpaceRepository);
@@ -219,11 +227,10 @@ class CreativeSpaceServiceTest {
         void create_shouldRejectNullPrincipal() {
                 // Arrange
                 Authentication authentication = mock(Authentication.class);
-                when(authentication.getPrincipal()).thenReturn(null);
 
                 // Act & Assert
                 assertThrows(
-                                IllegalArgumentException.class,
+                                AccessDeniedException.class,
                                 () -> creativeSpaceService.create(null, authentication));
 
                 verifyNoInteractions(creativeSpaceRepository);
@@ -235,7 +242,8 @@ class CreativeSpaceServiceTest {
                 UUID providerId = UUID.randomUUID();
 
                 Authentication authentication = mock(Authentication.class);
-                when(authentication.getPrincipal()).thenReturn(providerId.toString());
+                when(authentication.getDetails())
+                                .thenReturn(new ProviderAuthenticationDetails(providerId));
 
                 CreativeSpace creativeSpace = new CreativeSpace();
                 creativeSpace.setProviderId(providerId);
@@ -293,7 +301,8 @@ class CreativeSpaceServiceTest {
                 UUID creativeSpaceId = UUID.randomUUID();
 
                 Authentication authentication = mock(Authentication.class);
-                when(authentication.getPrincipal()).thenReturn(providerId.toString());
+                when(authentication.getDetails())
+                                .thenReturn(new ProviderAuthenticationDetails(providerId));
 
                 CreativeSpace creativeSpace = new CreativeSpace();
                 creativeSpace.setProviderId(providerId);
@@ -330,7 +339,8 @@ class CreativeSpaceServiceTest {
                 UUID creativeSpaceId = UUID.randomUUID();
 
                 Authentication authentication = mock(Authentication.class);
-                when(authentication.getPrincipal()).thenReturn(providerId.toString());
+                when(authentication.getDetails())
+                                .thenReturn(new ProviderAuthenticationDetails(providerId));
 
                 CreativeSpace creativeSpace = new CreativeSpace();
                 creativeSpace.setProviderId(providerId);
@@ -409,7 +419,8 @@ class CreativeSpaceServiceTest {
                 UUID creativeSpaceId = UUID.randomUUID();
 
                 Authentication authentication = mock(Authentication.class);
-                when(authentication.getPrincipal()).thenReturn(providerId.toString());
+                when(authentication.getDetails())
+                                .thenReturn(new ProviderAuthenticationDetails(providerId));
 
                 CreativeSpace creativeSpace = new CreativeSpace();
                 creativeSpace.setProviderId(providerId);

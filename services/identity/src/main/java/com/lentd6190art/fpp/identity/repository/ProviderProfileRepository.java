@@ -8,11 +8,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.UUID;
+import java.util.Optional;
 
 public interface ProviderProfileRepository
         extends JpaRepository<ProviderProfile, UUID> {
 
     boolean existsByUser_Email(String email);
+    Optional<ProviderProfile> findByUser_Id(UUID userId);
 
     Page<ProviderProfile> findByStatusOrderByCreatedAtAsc(
             ProviderStatus status,

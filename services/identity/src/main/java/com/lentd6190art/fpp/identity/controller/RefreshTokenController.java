@@ -2,6 +2,7 @@
 package com.lentd6190art.fpp.identity.controller;
 
 import java.util.List;
+import java.util.UUID;
 
 import com.lentd6190art.fpp.identity.dto.RefreshTokenRequest;
 import com.lentd6190art.fpp.identity.dto.RefreshTokenResponse;
@@ -10,6 +11,7 @@ import com.lentd6190art.fpp.identity.entity.Role;
 import com.lentd6190art.fpp.identity.entity.User;
 import com.lentd6190art.fpp.identity.service.JwtService;
 import com.lentd6190art.fpp.identity.service.RefreshTokenService;
+import com.lentd6190art.fpp.identity.service.ProviderIdentityService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -22,15 +24,18 @@ public class RefreshTokenController {
 
     private final RefreshTokenService refreshTokenService;
     private final JwtService jwtService;
+    private final ProviderIdentityService providerIdentityService;
     private final long accessTokenExpiration;
 
     public RefreshTokenController(
             RefreshTokenService refreshTokenService,
             JwtService jwtService,
+            ProviderIdentityService providerIdentityService,
             @Value("${app.jwt.access-token-expiration}") long accessTokenExpiration
     ) {
         this.refreshTokenService = refreshTokenService;
         this.jwtService = jwtService;
+        this.providerIdentityService = providerIdentityService;
         this.accessTokenExpiration = accessTokenExpiration;
     }
 
@@ -52,10 +57,13 @@ public class RefreshTokenController {
                 .map(Role::getName)
                 .toList();
 
+        UUID providerId = providerIdentityService.resolveProviderId(user);
+
         String newAccessToken = jwtService.generateAccessToken(
                 user.getId(),
                 user.getEmail(),
-                roles
+                roles,
+                providerId
         );
 
         return ResponseEntity.ok(new RefreshTokenResponse(
