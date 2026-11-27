@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../services/discovery_service.dart';
 
 class DiscoveryScreen extends StatefulWidget {
   const DiscoveryScreen({super.key});
@@ -10,45 +11,45 @@ class DiscoveryScreen extends StatefulWidget {
 class _DiscoveryScreenState extends State<DiscoveryScreen> {
   final TextEditingController _searchController = TextEditingController();
 
-  // Data mẫu, sau này sẽ thay bằng API Resource Service.
-  final List<Map<String, dynamic>> _spaces = [
-  {
-    'name': 'Saigon Film Lab',
-    'type': 'Darkroom',
-    'location': 'Ho Chi Minh City',
-    'price': 150000,
-    'style': 'Vintage',
-    'capacity': 5,
-    'equipment': ['Film scanner', 'Darkroom enlarger'],
-    'amenities': ['Wi-Fi', 'Air conditioning'],
-  },
-  {
-    'name': 'Vintage Studio',
-    'type': 'Photography Studio',
-    'location': 'Ho Chi Minh City',
-    'price': 300000,
-    'style': 'Retro',
-    'capacity': 10,
-    'equipment': ['Camera', 'Lighting'],
-    'amenities': ['Wi-Fi', 'Parking'],
-  },
-  {
-    'name': 'Analog Corner',
-    'type': 'Darkroom',
-    'location': 'Da Nang',
-    'price': 100000,
-    'style': 'Minimalist',
-    'capacity': 3,
-    'equipment': ['Film scanner'],
-    'amenities': ['Air conditioning'],
-  },
-];
+  final DiscoveryService _discoveryService = DiscoveryService();
+
+  List<Map<String, dynamic>> _spaces = [];
+
+  bool _isLoading = true;
+  String? _errorMessage;
 
   String _searchQuery = '';
   String? _selectedLocation;
   int? _maxPrice;
   String? _selectedStyle;
   int? _minCapacity;
+
+  @override
+    void initState() {
+      super.initState();
+      _loadCreativeSpaces();
+  }
+
+  Future<void> _loadCreativeSpaces() async {
+    try {
+      final spaces = await _discoveryService.getCreativeSpaces();
+
+      if (!mounted) return;
+
+      setState(() {
+        _spaces = spaces;
+        _isLoading = false;
+        _errorMessage = null;
+      });
+    } catch (e) {
+      if (!mounted) return;
+
+      setState(() {
+        _isLoading = false;
+        _errorMessage = e.toString();
+      });
+    }
+  }
 
   List<Map<String, dynamic>> get _filteredSpaces {
     return _spaces.where((space) {
@@ -359,19 +360,27 @@ class _DiscoveryScreenState extends State<DiscoveryScreen> {
     final spaces = _filteredSpaces;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F7F4),
+      backgroundColor: const Color(0xFFF7F1E9),
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF8F7F4),
-        elevation: 0,
-        title: const Text(
-          'Discover',
-          style: TextStyle(
-            fontSize: 26,
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
-          ),
+      backgroundColor: const Color(0xFFF7F1E9),
+      elevation: 0,
+      scrolledUnderElevation: 0,
+      leading: IconButton(
+        icon: const Icon(
+          Icons.arrow_back_rounded,
+          color: Color(0xFF49352B),
+        ),
+        onPressed: () => Navigator.pop(context),
+      ),
+      title: const Text(
+        'Khám phá',
+        style: TextStyle(
+          fontSize: 24,
+          fontWeight: FontWeight.bold,
+          color: Color(0xFF49352B),
         ),
       ),
+    ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -382,14 +391,23 @@ class _DiscoveryScreenState extends State<DiscoveryScreen> {
               onChanged: (value) {
                 setState(() {
                   _searchQuery = value.trim();
-                });
-              },
+             });
+           },
               decoration: InputDecoration(
-                hintText: 'Search studios, darkrooms...',
-                prefixIcon: const Icon(Icons.search),
+                hintText: 'Tìm studio, phòng tối...',
+                hintStyle: const TextStyle(
+                  color: Color(0xFF9B8A7D),
+                ),
+                prefixIcon: const Icon(
+                  Icons.search,
+                  color: Color(0xFF795548),
+                ),
                 suffixIcon: _searchQuery.isNotEmpty
                     ? IconButton(
-                        icon: const Icon(Icons.close),
+                        icon: const Icon(
+                          Icons.close,
+                          color: Color(0xFF795548),
+                        ),
                         onPressed: () {
                           _searchController.clear();
                           setState(() {
@@ -400,9 +418,28 @@ class _DiscoveryScreenState extends State<DiscoveryScreen> {
                     : null,
                 filled: true,
                 fillColor: Colors.white,
+                contentPadding: const EdgeInsets.symmetric(
+                  vertical: 16,
+                  horizontal: 16,
+                ),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: BorderSide.none,
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: const BorderSide(
+                    color: Color(0xFFE8DCD2),
+                  ),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: const BorderSide(
+                    color: Color(0xFFE8DCD2),
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: const BorderSide(
+                    color: Color(0xFFFF6500),
+                    width: 1.5,
+                  ),
                 ),
               ),
             ),
@@ -411,35 +448,62 @@ class _DiscoveryScreenState extends State<DiscoveryScreen> {
             Row(
               children: [
                 FilterChip(
-                  label: Text(_selectedLocation ?? 'Location'),
-                  avatar: const Icon(Icons.location_on_outlined),
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  showCheckmark: false,
+                  backgroundColor: const Color(0xFFF8F4EE),
+                  label: Text(_selectedLocation ?? 'Địa điểm'),
+                  avatar: const Icon(
+                  Icons.location_on_outlined,
+                  color: Color(0xFF795548),
+                ),
                   selected: _selectedLocation != null,
+                  selectedColor: const Color(0xFFFFE3D0),
+                  side: const BorderSide(color: Color(0xFFE8DCD2)),
+                  labelStyle: const TextStyle(color: Color(0xFF49352B)),
                   onSelected: (_) {
                   _showLocationFilter();
                 },
               ),
                 const SizedBox(width: 8),
                 FilterChip(
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  showCheckmark: false,
+                  backgroundColor: const Color(0xFFF8F4EE),
                   label: Text(
-                  _maxPrice == null ? 'Price' : '≤ ${_maxPrice! ~/ 1000}K',
+                  _maxPrice == null ? 'Giá' : '≤ ${_maxPrice! ~/ 1000}K',
                 ),
-                  avatar: const Icon(Icons.payments_outlined),
+                  avatar: const Icon(
+                  Icons.payments_outlined,
+                  color: Color(0xFF795548),
+                ),
                   selected: _maxPrice != null,
+                  selectedColor: const Color(0xFFFFE3D0),
+                  side: const BorderSide(color: Color(0xFFE8DCD2)),
+                  labelStyle: const TextStyle(color: Color(0xFF49352B)),
                   onSelected: (_) {
                   _showPriceFilter();
                 },
               ),
                 const SizedBox(width: 8),
                 FilterChip(
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  showCheckmark: false,
+                  backgroundColor: const Color(0xFFF8F4EE),
                   label: Text(
                     _selectedStyle != null
                         ? _selectedStyle!
                         : _minCapacity != null
                             ? '$_minCapacity+ people'
-                            : 'More',
+                            : 'Bộ Lọc',
                   ),
-                  avatar: const Icon(Icons.tune),
+                  avatar: const Icon(
+                  Icons.tune,
+                  color: Color(0xFF795548),
+                ),
                   selected: _selectedStyle != null || _minCapacity != null,
+                  selectedColor: const Color(0xFFFFE3D0),
+                  side: const BorderSide(color: Color(0xFFE8DCD2)),
+                  labelStyle: const TextStyle(color: Color(0xFF49352B)),
                   onSelected: (_) {
                     _showMoreFilters();
                   },
@@ -449,54 +513,252 @@ class _DiscoveryScreenState extends State<DiscoveryScreen> {
 
             const SizedBox(height: 24),
 
-            const Text(
-              'Creative Spaces',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Không gian sáng tạo',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF49352B),
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        'Tìm không gian hoàn hảo cho buổi chụp hình của bạn',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Color(0xFF8A7565),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFE3D0),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(
+                    Icons.camera_alt_outlined,
+                    color: Color(0xFF795548),
+                    size: 20,
+                  ),
+                ),
+              ],
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
 
-            Expanded(
-              child: spaces.isEmpty
-                  ? const Center(
-                      child: Text('No creative spaces found'),
-                    )
-                  : ListView.builder(
-                      itemCount: spaces.length,
-                      itemBuilder: (context, index) {
-                        final space = spaces[index];
+          Expanded(
+        child: _isLoading
+            ? const Center(
+                child: CircularProgressIndicator(
+                  color: Color(0xFF795548),
+                ),
+              )
+            : _errorMessage != null
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.error_outline,
+                          size: 48,
+                          color: Colors.redAccent,
+                        ),
+                        const SizedBox(height: 12),
+                        const Text(
+                          'Failed to load creative spaces',
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 8),
+                        ElevatedButton(
+                          onPressed: _loadCreativeSpaces,
+                          child: const Text('Retry'),
+                        ),
+                      ],
+                    ),
+                  )
 
-                        return Card(
-                          color: Colors.white,
-                          margin: const EdgeInsets.only(bottom: 12),
-                          child: ListTile(
-                            leading: const CircleAvatar(
-                              backgroundColor: Color(0xFFE8DCD2),
-                              child: Icon(
-                                Icons.camera_alt_outlined,
-                                color: Color(0xFF795548),
-                              ),
+                  : spaces.isEmpty
+                      ? Center(
+                          child: Container(
+                            width: double.infinity,
+                            margin: const EdgeInsets.symmetric(horizontal: 12),
+                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(24),
+                              border: Border.all(color: const Color(0xFFE8DCD2)),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(0xFF49352B).withValues(alpha: 0.05),
+                                  blurRadius: 20,
+                                  offset: const Offset(0, 8),
+                                ),
+                              ],
                             ),
-                            title: Text(
-                              space['name']!,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            subtitle: Text(
-                              '${space['type']} • ${space['location']}',
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Container(
+                                  width: 88,
+                                  height: 88,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFF8F4EE),
+                                    borderRadius: BorderRadius.circular(24),
+                                  ),
+                                  child: const Icon(
+                                    Icons.camera_alt_outlined,
+                                    size: 42,
+                                    color: Color(0xFF795548),
+                                  ),
+                                ),
+                                const SizedBox(height: 24),
+                                const Text(
+                                  'Chưa có không gian sáng tạo nào',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF49352B),
+                                  ),
+                                ),
+                                const SizedBox(height: 10),
+                                const Text(
+                                  'Hiện chưa tìm thấy không gian nào.\nHãy thử điều chỉnh bộ lọc hoặc quay lại sau nhé.',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    height: 1.6,
+                                    color: Color(0xFF8A7565),
+                                  ),
+                                ),
+                                const SizedBox(height: 24),
+                                OutlinedButton.icon(
+                                  onPressed: () {
+                                    _searchController.clear();
+                                    setState(() {
+                                      _searchQuery = '';
+                                      _selectedLocation = null;
+                                      _maxPrice = null;
+                                      _selectedStyle = null;
+                                      _minCapacity = null;
+                                    });
+                                  },
+                                  icon: const Icon(Icons.refresh_rounded),
+                                  label: const Text('Xóa bộ lọc'),
+                                  style: OutlinedButton.styleFrom(
+                                    foregroundColor: const Color(0xFF795548),
+                                    side: const BorderSide(color: Color(0xFFE8DCD2)),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 24,
+                                      vertical: 14,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(14),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                        );
-                      },
-                    ),
-            ),
-          ],
-        ),
+                        )
+                      : ListView.builder(
+                        itemCount: spaces.length,
+                        itemBuilder: (context, index) {
+                          final space = spaces[index];
+
+                       return Card(
+                        color: Colors.white,
+                        elevation: 0,
+                        shadowColor: const Color(0xFF49352B).withValues(alpha: 0.06),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                          side: const BorderSide(color: Color(0xFFE8DCD2)),
+                        ),
+                        margin: const EdgeInsets.only(bottom: 16),
+                        clipBehavior: Clip.antiAlias,
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                width: 76,
+                                height: 76,
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFF8F4EE),
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                child: const Icon(
+                                  Icons.camera_alt_outlined,
+                                  size: 32,
+                                  color: Color(0xFF795548),
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      space['name']?.toString() ?? 'Unnamed space',
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: Color(0xFF49352B),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      space['type']?.toString() ?? 'Creative Space',
+                                      style: const TextStyle(
+                                        fontSize: 13,
+                                        color: Color(0xFF795548),
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 6),
+                                    Row(
+                                      children: [
+                                        const Icon(
+                                          Icons.location_on_outlined,
+                                          size: 16,
+                                          color: Color(0xFF8A7565),
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Expanded(
+                                          child: Text(
+                                            space['location']?.toString() ?? 'Unknown location',
+                                            style: const TextStyle(
+                                              fontSize: 13,
+                                              color: Color(0xFF8A7565),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                        },
+                      ),
       ),
-    );
-  }
-}
+                ],
+              ),
+            ),
+          );
+        }
+      }
