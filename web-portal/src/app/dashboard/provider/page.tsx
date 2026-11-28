@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -89,7 +89,7 @@ export default function ProviderDashboardPage() {
 
           <section
             aria-label="Thống kê nhà cung cấp"
-            className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3"
+            className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3"
           >
             {statistics.map((item) => (
               <article key={item.title} className="fpp-card p-5 sm:p-6">

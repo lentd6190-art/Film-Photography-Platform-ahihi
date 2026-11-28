@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import DashboardLayout from "@/components/layout/DashboardLayout";
@@ -31,6 +31,8 @@ const statistics = [
 ];
 
 export default function AdminDashboardPage() {
+
+
   return (
     <ProtectedRoute allowedRoles={["ADMINISTRATOR"]}>
       <DashboardLayout title="Admin Dashboard">
@@ -39,9 +41,11 @@ export default function AdminDashboardPage() {
             <span className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--primary)]">
               ADMIN WORKSPACE
             </span>
+
             <h1 className="mt-2 text-2xl font-bold text-[var(--text-primary)] sm:text-3xl">
               Tổng quan hệ thống
             </h1>
+
             <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
               Theo dõi và quản lý hoạt động của Film Photography Platform.
             </p>
@@ -58,14 +62,17 @@ export default function AdminDashboardPage() {
                     <p className="text-sm font-medium text-[var(--text-secondary)]">
                       {item.title}
                     </p>
+
                     <p className="mt-4 text-3xl font-bold text-[var(--text-primary)]">
                       {item.value}
                     </p>
                   </div>
+
                   <span className="rounded-xl bg-[#FFF0E5] px-3 py-2 text-xs font-semibold text-[var(--primary)]">
                     {item.label}
                   </span>
                 </div>
+
                 <p className="mt-3 text-xs text-[var(--text-muted)]">
                   {item.description}
                 </p>
@@ -77,9 +84,11 @@ export default function AdminDashboardPage() {
             <span className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--primary)]">
               SYSTEM MANAGEMENT
             </span>
+
             <h2 className="mt-2 text-xl font-bold text-[var(--text-primary)]">
               Chức năng quản trị
             </h2>
+
             <p className="mt-3 max-w-3xl text-sm leading-7 text-[var(--text-secondary)]">
               Khu vực dành cho quản lý người dùng, nhà cung cấp, dịch vụ và
               hoạt động của hệ thống. Các chức năng quản trị sẽ được hoàn thiện
@@ -91,12 +100,15 @@ export default function AdminDashboardPage() {
                 <span className="text-xs font-semibold tracking-wider text-[var(--primary)]">
                   USER MANAGEMENT
                 </span>
+
                 <h3 className="mt-3 font-semibold text-[var(--text-primary)]">
                   Quản lý người dùng
                 </h3>
+
                 <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
                   Khu vực quản lý tài khoản và thông tin người dùng.
                 </p>
+
                 <span className="mt-4 inline-block rounded-full bg-[#F5EEE5] px-3 py-1 text-xs font-medium text-[var(--text-secondary)]">
                   Chưa triển khai giao diện
                 </span>
@@ -106,12 +118,15 @@ export default function AdminDashboardPage() {
                 <span className="text-xs font-semibold tracking-wider text-[var(--primary)]">
                   PROVIDER MANAGEMENT
                 </span>
+
                 <h3 className="mt-3 font-semibold text-[var(--text-primary)]">
                   Quản lý nhà cung cấp
                 </h3>
+
                 <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
                   Khu vực theo dõi và quản lý các nhà cung cấp dịch vụ.
                 </p>
+
                 <span className="mt-4 inline-block rounded-full bg-[#F5EEE5] px-3 py-1 text-xs font-medium text-[var(--text-secondary)]">
                   Chưa triển khai giao diện
                 </span>
@@ -121,12 +136,15 @@ export default function AdminDashboardPage() {
                 <span className="text-xs font-semibold tracking-wider text-[var(--primary)]">
                   SERVICE MANAGEMENT
                 </span>
+
                 <h3 className="mt-3 font-semibold text-[var(--text-primary)]">
                   Quản lý dịch vụ
                 </h3>
+
                 <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
                   Khu vực quản lý danh sách và thông tin dịch vụ.
                 </p>
+
                 <span className="mt-4 inline-block rounded-full bg-[#F5EEE5] px-3 py-1 text-xs font-medium text-[var(--text-secondary)]">
                   Chưa triển khai giao diện
                 </span>
@@ -136,12 +154,15 @@ export default function AdminDashboardPage() {
                 <span className="text-xs font-semibold tracking-wider text-[var(--primary)]">
                   BOOKING MANAGEMENT
                 </span>
+
                 <h3 className="mt-3 font-semibold text-[var(--text-primary)]">
                   Quản lý đặt lịch
                 </h3>
+
                 <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
                   Khu vực theo dõi và quản lý hoạt động đặt lịch.
                 </p>
+
                 <span className="mt-4 inline-block rounded-full bg-[#F5EEE5] px-3 py-1 text-xs font-medium text-[var(--text-secondary)]">
                   Chưa triển khai giao diện
                 </span>

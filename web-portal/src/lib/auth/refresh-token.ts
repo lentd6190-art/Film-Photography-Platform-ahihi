@@ -28,7 +28,7 @@ async function performRefresh(
   request: RefreshTokenRequest,
 ): Promise<AuthTokenResponse> {
   const response = await axios.post<AuthTokenResponse>(
-    `${API_BASE_URL}/api/v1/auth/refresh-token`,
+    `${API_BASE_URL}/v1/auth/refresh-token`,
     request,
     {
       headers: {

@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -28,6 +28,7 @@ export default function DashboardLayout({
   const isAdmin = roles.includes("ADMINISTRATOR");
   const isProvider = roles.includes("SERVICE_PROVIDER");
 
+  // Chỉ hiển thị các trang phù hợp với vai trò tài khoản.
   const dashboardLinks: DashboardLink[] = [
     ...(isAdmin
       ? [{ href: "/dashboard/admin", label: "Admin Dashboard" }]
@@ -52,18 +53,17 @@ export default function DashboardLayout({
   ];
 
   function isActive(href: string): boolean {
-    if (href === "/dashboard/provider") {
-      return pathname === href;
-    }
-
-    if (href === "/dashboard/admin") {
+    if (
+      href === "/dashboard/provider" ||
+      href === "/dashboard/admin"
+    ) {
       return pathname === href;
     }
 
     return pathname === href || pathname.startsWith(`${href}/`);
   }
 
-  function handleLogout() {
+  function handleLogout(): void {
     logout();
     router.replace("/login");
   }
@@ -73,11 +73,12 @@ export default function DashboardLayout({
       <>
         <Link
           href="/"
+          aria-current={pathname === "/" ? "page" : undefined}
           className={`block shrink-0 rounded-xl px-4 py-3 text-sm font-medium transition ${
             pathname === "/"
               ? "bg-orange-100 text-orange-700"
               : "text-[#806F62] hover:bg-white hover:text-[#49382D]"
-          }`}
+          } ${mobile ? "whitespace-nowrap" : ""}`}
         >
           Trang chủ
         </Link>
@@ -132,7 +133,10 @@ export default function DashboardLayout({
             Menu chính
           </p>
 
-          <nav className="space-y-1.5">
+          <nav
+            aria-label="Điều hướng chính"
+            className="space-y-1.5"
+          >
             {renderNavigationLinks()}
           </nav>
         </div>
@@ -141,6 +145,7 @@ export default function DashboardLayout({
           <p className="text-xs font-semibold uppercase tracking-wider text-[#A39487]">
             Vai trò tài khoản
           </p>
+
           <p className="mt-2 break-words text-sm font-semibold text-[#49382D]">
             {roles.join(", ") || "Chưa xác định"}
           </p>
@@ -156,6 +161,7 @@ export default function DashboardLayout({
                 <span className="text-lg font-extrabold text-[#FF5A00]">
                   FILM.
                 </span>
+
                 <span className="text-sm font-bold text-[#49382D]">
                   Studio
                 </span>

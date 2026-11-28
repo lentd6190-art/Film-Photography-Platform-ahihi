@@ -17,7 +17,7 @@ async function login(
   credentials: LoginRequest,
 ): Promise<AuthTokenResponse> {
   const response = await apiClient.post<AuthTokenResponse>(
-    "/api/v1/auth/login",
+    "/v1/auth/login",
     credentials,
   );
 
@@ -35,7 +35,6 @@ async function registerProvider(
 
   return response.data;
 }
-
 // Làm mới token thông qua cơ chế dùng chung.
 function refreshToken(
   request: RefreshTokenRequest,
