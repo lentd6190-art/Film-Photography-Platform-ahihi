@@ -8,7 +8,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -79,18 +78,34 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                 authorities
                         );
 
+                UUID providerId = resolveProviderId(claims);
+
                 authentication.setDetails(
-                        new WebAuthenticationDetailsSource()
-                                .buildDetails(request)
+                        new ProviderAuthenticationDetails(providerId)
                 );
 
                 SecurityContextHolder.getContext()
                         .setAuthentication(authentication);
             }
+
         } catch (Exception exception) {
             SecurityContextHolder.clearContext();
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    private UUID resolveProviderId(Claims claims) {
+        Object providerIdClaim = claims.get("providerId");
+
+        if (!(providerIdClaim instanceof String providerId)) {
+            return null;
+        }
+
+        try {
+            return UUID.fromString(providerId);
+        } catch (IllegalArgumentException exception) {
+            return null;
+        }
     }
 }

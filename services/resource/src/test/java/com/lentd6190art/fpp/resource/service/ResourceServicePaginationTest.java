@@ -19,11 +19,13 @@ import com.lentd6190art.fpp.resource.dto.response.PageResponse;
 import com.lentd6190art.fpp.resource.dto.response.ResourceResponse;
 import com.lentd6190art.fpp.resource.model.CreativeSpace;
 import com.lentd6190art.fpp.resource.model.Consumable;
+import com.lentd6190art.fpp.resource.config.ProviderAuthenticationDetails;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
@@ -40,15 +42,27 @@ class ResourceServicePaginationTest {
 
     private ResourceService resourceService;
     private EquipmentRepository equipmentRepository;
+    private CreativeSpaceRepository creativeSpaceRepository;
+    private ConsumableRepository consumableRepository;
+    private Authentication authentication;
+    private UUID providerId;
 
     @BeforeEach
     void setUp() {
+        providerId = UUID.randomUUID();
+
         equipmentRepository = mock(EquipmentRepository.class);
+        creativeSpaceRepository = mock(CreativeSpaceRepository.class);
+        consumableRepository = mock(ConsumableRepository.class);
+        authentication = mock(Authentication.class);
+
+        when(authentication.getDetails())
+        .thenReturn(new ProviderAuthenticationDetails(providerId));
 
         resourceService = new ResourceService(
-                mock(CreativeSpaceRepository.class),
+                creativeSpaceRepository,
                 equipmentRepository,
-                mock(ConsumableRepository.class),
+                consumableRepository,
                 mock(ObjectMapper.class));
     }
 
@@ -57,7 +71,6 @@ class ResourceServicePaginationTest {
         // Arrange
         CreativeSpace space = mock(CreativeSpace.class);
         UUID id = UUID.randomUUID();
-        UUID providerId = UUID.randomUUID();
         OffsetDateTime now = OffsetDateTime.now();
 
         when(space.getId()).thenReturn(id);
@@ -79,18 +92,12 @@ class ResourceServicePaginationTest {
                 PageRequest.of(0, 2),
                 3);
 
-        CreativeSpaceRepository repository = mock(CreativeSpaceRepository.class);
-
-        when(repository.findAll(any(Pageable.class))).thenReturn(spacePage);
-
-        resourceService = new ResourceService(
-                repository,
-                equipmentRepository,
-                mock(ConsumableRepository.class),
-                mock(ObjectMapper.class));
+        when(creativeSpaceRepository.findAllByProviderId(
+                org.mockito.ArgumentMatchers.eq(providerId),
+                any(Pageable.class))).thenReturn(spacePage);
 
         // Act
-        PageResponse<ResourceResponse> response = resourceService.getResources(ResourceType.CREATIVE_SPACE, 0, 2);
+        PageResponse<ResourceResponse> response = resourceService.getResources(ResourceType.CREATIVE_SPACE, 0, 2, authentication);
 
         // Assert
         assertEquals(1, response.data().size());
@@ -113,7 +120,6 @@ class ResourceServicePaginationTest {
         // Arrange
         Consumable consumable = mock(Consumable.class);
         UUID id = UUID.randomUUID();
-        UUID providerId = UUID.randomUUID();
         OffsetDateTime now = OffsetDateTime.now();
 
         when(consumable.getId()).thenReturn(id);
@@ -134,18 +140,13 @@ class ResourceServicePaginationTest {
                 PageRequest.of(1, 2),
                 5);
 
-        ConsumableRepository repository = mock(ConsumableRepository.class);
 
-        when(repository.findAll(any(Pageable.class))).thenReturn(consumablePage);
-
-        resourceService = new ResourceService(
-                mock(CreativeSpaceRepository.class),
-                equipmentRepository,
-                repository,
-                mock(ObjectMapper.class));
+        when(consumableRepository.findAllByProviderId(
+                org.mockito.ArgumentMatchers.eq(providerId),
+                any(Pageable.class))).thenReturn(consumablePage);
 
         // Act
-        PageResponse<ResourceResponse> response = resourceService.getResources(ResourceType.CONSUMABLE, 1, 2);
+        PageResponse<ResourceResponse> response = resourceService.getResources(ResourceType.CONSUMABLE, 1, 2, authentication);
 
         // Assert
         assertEquals(1, response.data().size());
@@ -165,10 +166,10 @@ class ResourceServicePaginationTest {
 
     @Test
     void getResources_shouldRejectNegativePage() {
-        assertThrows(
+                assertThrows(
                 IllegalArgumentException.class,
                 () -> resourceService.getResources(
-                        ResourceType.EQUIPMENT, -1, 10));
+                        ResourceType.EQUIPMENT, -1, 10, authentication));
     }
 
     @Test
@@ -176,7 +177,7 @@ class ResourceServicePaginationTest {
         assertThrows(
                 IllegalArgumentException.class,
                 () -> resourceService.getResources(
-                        ResourceType.EQUIPMENT, 0, 0));
+                        ResourceType.EQUIPMENT, 0, 0, authentication));
     }
 
     @Test
@@ -184,7 +185,7 @@ class ResourceServicePaginationTest {
         assertThrows(
                 IllegalArgumentException.class,
                 () -> resourceService.getResources(
-                        ResourceType.EQUIPMENT, 0, 101));
+                        ResourceType.EQUIPMENT, 0, 101, authentication));
     }
 
     @Test
@@ -194,7 +195,6 @@ class ResourceServicePaginationTest {
         Equipment equipment2 = mock(Equipment.class);
 
         UUID id1 = UUID.randomUUID();
-        UUID providerId = UUID.randomUUID();
 
         OffsetDateTime now = OffsetDateTime.now();
 
@@ -229,11 +229,13 @@ class ResourceServicePaginationTest {
                 PageRequest.of(0, 2),
                 5);
 
-        when(equipmentRepository.findAll(any(Pageable.class)))
+        when(equipmentRepository.findAllByProviderId(
+                org.mockito.ArgumentMatchers.eq(providerId),
+                any(Pageable.class)))
                 .thenReturn(equipmentPage);
 
         // Act: Call service
-        PageResponse<ResourceResponse> response = resourceService.getResources(ResourceType.EQUIPMENT, 0, 2);
+        PageResponse<ResourceResponse> response = resourceService.getResources(ResourceType.EQUIPMENT, 0, 2, authentication);
 
         // Assert: Pagination metadata
         assertEquals(0, response.pagination().page());
@@ -274,7 +276,7 @@ class ResourceServicePaginationTest {
         OffsetDateTime now = OffsetDateTime.now();
 
         when(equipment.getId()).thenReturn(UUID.randomUUID());
-        when(equipment.getProviderId()).thenReturn(UUID.randomUUID());
+        when(equipment.getProviderId()).thenReturn(providerId);
         when(equipment.getName()).thenReturn("Film Camera");
         when(equipment.getDescription()).thenReturn("35mm camera");
         when(equipment.getCategory()).thenReturn("Camera");
@@ -291,11 +293,13 @@ class ResourceServicePaginationTest {
                 PageRequest.of(1, 2),
                 5);
 
-        when(equipmentRepository.findAll(any(Pageable.class)))
+        when(equipmentRepository.findAllByProviderId(
+                org.mockito.ArgumentMatchers.eq(providerId),
+                any(Pageable.class)))
                 .thenReturn(equipmentPage);
 
         // Act
-        PageResponse<ResourceResponse> response = resourceService.getResources(ResourceType.EQUIPMENT, 1, 2);
+        PageResponse<ResourceResponse> response = resourceService.getResources(ResourceType.EQUIPMENT, 1, 2, authentication);
 
         // Assert
         assertEquals(1, response.pagination().page());
@@ -317,7 +321,7 @@ class ResourceServicePaginationTest {
         OffsetDateTime now = OffsetDateTime.now();
 
         when(equipment.getId()).thenReturn(UUID.randomUUID());
-        when(equipment.getProviderId()).thenReturn(UUID.randomUUID());
+        when(equipment.getProviderId()).thenReturn(providerId);
         when(equipment.getName()).thenReturn("Film Camera");
         when(equipment.getDescription()).thenReturn("35mm camera");
         when(equipment.getCategory()).thenReturn("Camera");
@@ -334,11 +338,13 @@ class ResourceServicePaginationTest {
                 PageRequest.of(2, 2),
                 5);
 
-        when(equipmentRepository.findAll(any(Pageable.class)))
+        when(equipmentRepository.findAllByProviderId(
+                org.mockito.ArgumentMatchers.eq(providerId),
+                any(Pageable.class)))
                 .thenReturn(equipmentPage);
 
         // Act
-        PageResponse<ResourceResponse> response = resourceService.getResources(ResourceType.EQUIPMENT, 2, 2);
+        PageResponse<ResourceResponse> response = resourceService.getResources(ResourceType.EQUIPMENT, 2, 2, authentication);
 
         // Assert
         assertEquals(2, response.pagination().page());
@@ -360,11 +366,13 @@ class ResourceServicePaginationTest {
                 PageRequest.of(0, 10),
                 0);
 
-        when(equipmentRepository.findAll(any(Pageable.class)))
+        when(equipmentRepository.findAllByProviderId(
+                org.mockito.ArgumentMatchers.eq(providerId),
+                any(Pageable.class)))
                 .thenReturn(emptyPage);
 
         // Act
-        PageResponse<ResourceResponse> response = resourceService.getResources(ResourceType.EQUIPMENT, 0, 10);
+        PageResponse<ResourceResponse> response = resourceService.getResources(ResourceType.EQUIPMENT, 0, 10, authentication);
 
         // Assert
         assertTrue(response.data().isEmpty());

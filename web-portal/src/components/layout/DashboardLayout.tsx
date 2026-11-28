@@ -1,4 +1,3 @@
-
 "use client";
 
 import Link from "next/link";
@@ -29,17 +28,38 @@ export default function DashboardLayout({
   const isAdmin = roles.includes("ADMINISTRATOR");
   const isProvider = roles.includes("SERVICE_PROVIDER");
 
-  // Chỉ hiển thị những trang Dashboard đã tồn tại.
+  // Chỉ hiển thị các trang phù hợp với vai trò tài khoản.
   const dashboardLinks: DashboardLink[] = [
-      ...(isAdmin
-        ? [{ href: "/dashboard/admin", label: "Admin Dashboard" }]
-        : []),
-      ...(isProvider
-        ? [{ href: "/dashboard/provider", label: "Provider Dashboard" }]
-        : []),
-    ];
+    ...(isAdmin
+      ? [{ href: "/dashboard/admin", label: "Admin Dashboard" }]
+      : []),
+    ...(isProvider
+      ? [
+          { href: "/dashboard/provider", label: "Provider Dashboard" },
+          {
+            href: "/dashboard/provider/creative-spaces",
+            label: "Creative Spaces",
+          },
+          {
+            href: "/dashboard/provider/equipment",
+            label: "Equipment",
+          },
+          {
+            href: "/dashboard/provider/consumables",
+            label: "Consumables",
+          },
+        ]
+      : []),
+  ];
 
   function isActive(href: string): boolean {
+    if (
+      href === "/dashboard/provider" ||
+      href === "/dashboard/admin"
+    ) {
+      return pathname === href;
+    }
+
     return pathname === href || pathname.startsWith(`${href}/`);
   }
 
